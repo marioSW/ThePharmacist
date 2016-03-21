@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffff"
+    tools:context=".EnterEmailActivity">
+
+    <TextView
+        android:layout_marginTop="70dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Enter Your Email Address"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/txtTitle1"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="10dp"
+        android:layout_below="@+id/txtTitle1"
+        android:text="You'll use this email when you log in and if you ever need to reset your password"
+        android:gravity="center"
+        android:id="@+id/txtDescription1"/>
+
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email Address"
+        android:layout_marginTop="10dp"
+        android:id="@+id/txtEmail1"
+        android:inputType="textEmailAddress"
+        android:layout_below="@+id/txtDescription1"/>
+
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:text="Next"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:background="@drawable/mybutton"
+        android:layout_below="@+id/txtEmail1"
+        android:id="@+id/btnEmailToMobileNo"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:text="Sign Up with Mobile Number"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/colorPrimary"
+        android:id="@+id/btnSignUpWithMobile"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
+
+

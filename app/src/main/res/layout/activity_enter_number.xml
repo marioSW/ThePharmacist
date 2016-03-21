@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffff"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_marginTop="70dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Enter Your Mobile Number"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/txtTitle"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="10dp"
+        android:layout_below="@+id/txtTitle"
+        android:text="You'll use this number when you log in and if you ever need to reset your password"
+        android:gravity="center"
+        android:id="@+id/txtDescription"/>
+
+
+    <Spinner
+        android:id="@+id/drpCountries"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:drawable/btn_dropdown"
+        android:gravity="center"
+        android:layout_marginLeft="5dp"
+        android:spinnerMode="dropdown"
+        android:layout_below="@+id/txtDescription"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mobile Number"
+        android:inputType="number"
+        android:layout_marginTop="10dp"
+        android:id="@+id/txtMobileNumber"
+        android:layout_below="@+id/drpCountries"/>
+
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:text="Next"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:background="@drawable/mybutton"
+        android:layout_below="@+id/txtMobileNumber"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btnMobileNo"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:text="Sign up with Email Address"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/colorPrimary"
+        android:id="@+id/txtEnterMobileNumberButton"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
+

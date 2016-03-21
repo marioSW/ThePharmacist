@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffff"
+    tools:context=".EnterEmailActivity">
+
+    <TextView
+        android:layout_marginTop="70dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="What is Your Birth Day ?"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/txtTitle2"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="10dp"
+        android:layout_below="@+id/txtTitle2"
+        android:text="providing your real birthday would help the Pharmacist to give you the correct drug Dosage."
+        android:gravity="center"
+        android:id="@+id/txtDescription2"/>
+
+
+    <DatePicker
+        android:id="@+id/datePicker1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtDescription2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false"/>
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_below="@+id/datePicker1"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:text="Next"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:id="@+id/txtPwd"
+        android:background="@drawable/mybutton"
+        android:layout_centerHorizontal="true"/>
+
+
+
+
+
+</RelativeLayout>
+
