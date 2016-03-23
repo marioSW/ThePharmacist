@@ -32,9 +32,7 @@
             android:name=".EnterBirthDayActivity"
             android:label="Enter BirthDay" />
         <activity android:name=".EnterPwdActivity" />
-
         <activity android:name=".MainActivity" />
-
         <activity android:name=".LoginActivity" />
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -46,8 +44,10 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".EnterNumberActivity"
-            android:label="Enter Number"></activity>
+        <activity
+            android:name=".EnterNumberActivity"
+            android:label="Enter Number" />
+        <activity android:name=".Recover_password"></activity>
     </application>
 
 </manifest>

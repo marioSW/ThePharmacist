@@ -179,6 +179,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    public void reset_pass(View view){
+        startActivity(new Intent(this, Recover_password.class));
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
