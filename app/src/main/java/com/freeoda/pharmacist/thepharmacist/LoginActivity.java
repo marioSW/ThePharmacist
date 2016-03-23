@@ -174,7 +174,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         login_create_account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, EnterNumberActivity.class));
+                startActivity(new Intent(LoginActivity.this, Home.class));
             }
         });
     }
