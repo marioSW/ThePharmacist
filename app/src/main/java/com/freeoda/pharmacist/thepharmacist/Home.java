@@ -24,7 +24,7 @@ public class Home extends AppCompatActivity {
 
     Button button;
     Button gallery;
-    ImageView imageView;
+   // ImageView imageView;
     static final int CAM_REQUEST=1;
     static final int SELECT_PICTURE = 2;
     private static final String JPEG_FILE_PREFIX = "IMG_";
@@ -41,7 +41,7 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         button=(Button)findViewById(R.id.button2);
-        imageView=(ImageView)findViewById(R.id.image_view);
+        //imageView=(ImageView)findViewById(R.id.image_view);
         gallery=(Button)findViewById(R.id.button3);
 
         gallery.setOnClickListener(
@@ -100,7 +100,7 @@ public class Home extends AppCompatActivity {
        // String path="/sdcard/the_pharmacist/came_image.jpg";
         if((resultCode == RESULT_OK)) {
             if(requestCode==CAM_REQUEST){
-            setPic(path);
+            //setPic(path);
             Intent i = new Intent(this, DisplayImage.class);
             //Create the bundle
             Bundle bundle = new Bundle();
@@ -112,7 +112,7 @@ public class Home extends AppCompatActivity {
             {
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
-                setPic(selectedImagePath);
+                //setPic(selectedImagePath);
                 Intent i = new Intent(this, DisplayImage.class);
                 //Create the bundle
                 Bundle bundle = new Bundle();
@@ -142,57 +142,6 @@ public class Home extends AppCompatActivity {
         return uri.getPath();
     }
 
-    private void setPic(String mCurrentPhotoPath) {
-
-		/* There isn't enough memory to open up more than a couple camera photos */
-		/* So pre-scale the target bitmap into which the file is decoded */
-
-		/* Get the size of the ImageView */
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
-
-		/* Get the size of the image */
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-		/* Figure out which way needs to be reduced less */
-        int scaleFactor = 1;
-        if ((targetW > 0) || (targetH > 0)) {
-            scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        }
-
-		/* Set bitmap options to scale the image decode target */
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-		/* Decode the JPEG file into a Bitmap */
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		/* Associate the Bitmap to the ImageView */
-
-        ExifInterface ei = null;
-        try {
-            ei = new ExifInterface(mCurrentPhotoPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-        Bitmap bit=null;
-        switch(orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                bit=rotateImage(bitmap, 90);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                bit=rotateImage(bitmap, 180);
-                break;
-            // etc.
-        }
-        imageView.setImageBitmap(bit);
-        imageView.setVisibility(View.VISIBLE);
-    }
 
     public static Bitmap rotateImage(Bitmap source, float angle) {
         Bitmap retVal;
