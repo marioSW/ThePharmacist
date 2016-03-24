@@ -25,7 +25,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
-import com.freeoda.pharmacist.thepharmacist.models.User;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkCallback;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
 import com.google.android.gms.auth.api.Auth;
@@ -39,7 +38,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
@@ -78,7 +76,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
-    public static boolean mGooglePlusLogoutClicked;
     private ConnectionResult mConnectionResult;
 
     @Override
@@ -129,39 +126,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     // Application code
                                     try {
                                         JSONObject jobject = new JSONObject(response.getRawResponse());
-                                        User user = new User();
-                                        user.setFirstName(jobject.getString("first_name"));
-                                        user.setLastName((jobject.getString("last_name")));
-                                        user.setBirthDate(jobject.getString("birthday"));
-                                        if (jobject.has("mobile")) {
-                                            user.setMobileNo(jobject.getString("mobile"));
-                                        }
-                                        else{
-                                            user.setMobileNo("Not_given");
-                                        }
-                                        user.setEmail(jobject.getString("email"));
-                                        user.setPassword("fb_password");
-                                        NetworkFacade.registerUser(user,getApplicationContext(), new NetworkCallback() {
-                                            @Override
-                                            public void onSuccess(ModelApi result) {
-                                                Log.d("TAG",result.toString());
-                                            }
-
-                                            @Override
-                                            public void onError(CustomException exception) {
-
-                                            }
-                                        });
-
+                                        String googleFbName = jobject.getString("first_name") + " " + jobject.getString("last_name");
+                                        Log.i("TAG", googleFbName);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
 
+                                    Intent loginIntent = new Intent(LoginActivity.this,Home.class);
                                     SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedpreferences.edit();
                                     editor.putString("LoginMethod", "facebook");
                                     editor.commit();
-                                    Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                    //Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(loginIntent);
 
 
@@ -258,7 +234,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString("LoginMethod", "normal");
                         editor.commit();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        startActivity(new Intent(LoginActivity.this, Home.class));
+                        
+                        //startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }
 
                     @Override
@@ -329,15 +307,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("Exit me", true);
-        startActivity(intent);
-        finish();
-    }
-
     protected void onStop() {
         super.onStop();
         if (mGoogleApiClient.isConnected()) {
@@ -395,12 +364,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
             //getProfileInformation();
-            SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedpreferences.edit();
-            editor.putString("LoginMethod", "google");
-            editor.commit();
-
-            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(LoginActivity.this, Home.class);
             startActivity(i);
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //updateUI(true);
@@ -429,7 +394,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public static void googlePlusLogout() {
-        Log.i("TAG", "Google log outttttttttttttttt");
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
             mGoogleApiClient.disconnect();
@@ -438,29 +402,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public static void logoutFromGooglePlus() {
-        mGooglePlusLogoutClicked = true;  // Keep track when you click logout
-        if (mGoogleApiClient.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-            revokeAccess();
-
-        } else {
-            mGoogleApiClient.connect();   // It can send user to onConnected(), call logout again from there
-        }
-    }
-
-    // revoke access (if needed)
-    protected static void revokeAccess() {
-
-        Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        mGoogleApiClient.disconnect();
-                        mGoogleApiClient.connect();
-                        // Clear data and go to login activity
-                    }
-                });
-    }
 
 }
