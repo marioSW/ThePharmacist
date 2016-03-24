@@ -161,7 +161,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     SharedPreferences.Editor editor = sharedpreferences.edit();
                                     editor.putString("LoginMethod", "facebook");
                                     editor.commit();
-                                    Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                    //Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+
+                                    Intent loginIntent = new Intent(LoginActivity.this,Home.class);
+
                                     startActivity(loginIntent);
 
 
@@ -204,7 +207,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         login_create_account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, EnterNumberActivity.class));
+                startActivity(new Intent(LoginActivity.this,EnterNameActivity.class));
             }
         });
     }
@@ -258,7 +261,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         SharedPreferences.Editor editor = sharedpreferences.edit();
                         editor.putString("LoginMethod", "normal");
                         editor.commit();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        startActivity(new Intent(LoginActivity.this, Home.class));
+
                     }
 
                     @Override
@@ -400,7 +405,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             editor.putString("LoginMethod", "google");
             editor.commit();
 
-            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            //Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            //Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(LoginActivity.this, Home.class);
+
             startActivity(i);
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //updateUI(true);
