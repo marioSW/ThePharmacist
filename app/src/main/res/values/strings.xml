@@ -4,4 +4,6 @@
     <string name="facebook_app_id">554792134682354</string>
     <string name="title_activity_home">Home</string>
     <string name="title_activity_display_image">DisplayImage</string>
+    <string name="capture_image">Capture Image</string>
+    <string name="gallery">Gallery</string>
 </resources>
