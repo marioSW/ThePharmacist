@@ -1,5 +1,8 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.facebook.login.LoginManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,6 +52,37 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.logout){
+
+            SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+
+            String loginMethod = sharedpreferences.getString("LoginMethod","");
+            Log.i("TAG",loginMethod);
+            if(loginMethod.equals("facebook")){
+                LoginManager.getInstance().logOut();
+                finish();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+
+                editor.putString("LoginMethod", "");
+                editor.commit();
+
+                // Clear Preferences and other data and go back to login activty
+            }
+            else if (loginMethod.equals("google")){
+                //LoginActivity.googlePlusLogout();
+                LoginActivity.mGooglePlusLogoutClicked = true;
+                finish();
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                editor.putString("LoginMethod", "");
+                editor.commit();
+            }
+            else if (loginMethod.equals("normal")){
+                finish();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                editor.putString("LoginMethod", "");
+                editor.commit();
+            }
         }
 
         return super.onOptionsItemSelected(item);

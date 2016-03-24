@@ -41,10 +41,8 @@ public class EnterNumberActivity extends AppCompatActivity {
         citizenship.setAdapter(adapter);
 
         txtMobileNo = (EditText)findViewById(R.id.txtMobileNumber);
-
-
-        Button btnMobileNumber  =(Button)findViewById(R.id.txtEnterMobileNumberButton);
-        btnMobileNumber.setOnClickListener(new View.OnClickListener() {
+        Button btnMobileNo  =(Button)findViewById(R.id.btnMobileNo);
+        btnMobileNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (txtMobileNo.getText().toString().equals("")) {
@@ -54,25 +52,23 @@ public class EnterNumberActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedpreferences.edit();
                     editor.putString("mobile",txtMobileNo.getText().toString() );
                     editor.commit();
+                    startActivity(new Intent(EnterNumberActivity.this, EnterNameActivity.class));
+                }
+            }
+        });
+
+        Button btnMobileNumber  =(Button)findViewById(R.id.txtEnterMobileNumberButton);
+        btnMobileNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                     //global.personDetails.setMobileNo(txtMobileNo.getText().toString());
                     startActivity(new Intent(EnterNumberActivity.this, EnterEmailActivity.class));
 
                 }
 
-            }
         });
 
-        Button btnMobileNo  =(Button)findViewById(R.id.btnMobileNo);
-        btnMobileNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (txtMobileNo.getText().toString().equals("")) {
-                    txtMobileNo.setError("Please enter Mobile Number");
-                } else {
-                    startActivity(new Intent(EnterNumberActivity.this, EnterNameActivity.class));
-                }
-            }
-        });
+
     }
 }
 
