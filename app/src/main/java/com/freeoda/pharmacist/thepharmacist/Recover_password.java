@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,25 +22,26 @@ public class Recover_password extends AppCompatActivity {
 
     //EditText email = (EditText)findViewById(R.id.reset_email);
 
-    class RetrieveFeedTask extends AsyncTask<Void, Void, String>{
+    class RetrieveFeedTask extends AsyncTask<String, Void, String>{
 
         @Override
-        protected String doInBackground(Void... voids) {
+        protected String doInBackground(String... pParams) {
             StringBuffer chaine = new StringBuffer("");
             String response = "";
+            String mail = pParams[0];
             try {
-                URL url = new URL("http://pharmacist2016.netau.net/reset_password.php");
+                URL url = new URL("http://pharmacist2016.netau.net/reset_pass/reset_password.php");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("User-Agent", "");
+                //connection.setRequestProperty("User-Agent", "");
                 connection.setRequestMethod("POST");
                 connection.setDoInput(true);
 
                 OutputStream os = connection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(os, "UTF-8"));
-                writer.write("mail=hi");
+                writer.write("mail=" + mail);
 
-                writer.flush();
+                        writer.flush();
                 writer.close();
                 os.close();
                 int responseCode=connection.getResponseCode();
@@ -61,6 +63,7 @@ public class Recover_password extends AppCompatActivity {
 
             //return response;
 
+
             Log.d("eeeeeee", response);
             Log.d("dddddddd", "------------------------------------------------");
             return null;
@@ -77,7 +80,9 @@ public class Recover_password extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new RetrieveFeedTask().execute();
+                EditText emailAddress = (EditText)findViewById(R.id.reset_email);
+                String strMail = emailAddress.getText().toString();
+                new RetrieveFeedTask().execute(strMail);
             }
         });
     }
