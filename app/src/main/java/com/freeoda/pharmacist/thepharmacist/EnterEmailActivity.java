@@ -16,8 +16,8 @@ public class EnterEmailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_email);
 
-        final EditText txtEmail = (EditText)findViewById(R.id.txtEmail1);
-        Button btnMobile  = (Button)findViewById(R.id.btnSignUpWithMobile);
+        final EditText txtEmail = (EditText) findViewById(R.id.txtEmail1);
+        Button btnMobile = (Button) findViewById(R.id.btnSignUpWithMobile);
         btnMobile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -25,16 +25,20 @@ public class EnterEmailActivity extends AppCompatActivity {
             }
         });
 
-        Button btnMobileNo  =(Button)findViewById(R.id.btnEmailToMobileNo);
+        Button btnMobileNo = (Button) findViewById(R.id.btnEmailToMobileNo);
         btnMobileNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //global.personDetails.setEmail(txtEmail.getText().toString());
-                SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putString("Email",txtEmail.getText().toString() );
-                editor.commit();
-                startActivity(new Intent(EnterEmailActivity.this, EnterNameActivity.class));
+                if (txtEmail.getText().toString().equals("")) {
+                    txtEmail.setError("Please enter Mobile Number");
+                } else {
+                    SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putString("Email", txtEmail.getText().toString());
+                    editor.commit();
+                    startActivity(new Intent(EnterEmailActivity.this, EnterNameActivity.class));
+                }
             }
         });
     }

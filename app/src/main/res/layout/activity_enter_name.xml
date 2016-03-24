@@ -4,34 +4,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffff"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
     tools:context=".EnterEmailActivity">
 
     <TextView
-        android:layout_marginTop="70dp"
+        android:id="@+id/txtTitle2"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="What is Your Name ?"
         android:layout_gravity="center_horizontal"
-        android:textStyle="bold"
-        android:textSize="20dp"
+        android:layout_marginTop="70dp"
         android:gravity="center"
-        android:id="@+id/txtTitle2"/>
+        android:text="What is Your Name ?"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
     <TextView
+        android:id="@+id/txtDescription2"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:textSize="10dp"
         android:layout_below="@+id/txtTitle2"
-        android:text="Please Enter your real name so that it would be easier for the pharmacist when delivering the product."
         android:gravity="center"
-        android:id="@+id/txtDescription2"/>
+        android:text="Please Enter your real name so that it would be easier for the pharmacist when delivering the product."
+        android:textSize="10dp" />
 
-<LinearLayout android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    android:orientation="horizontal"
-    android:id="@+id/layoutName"
-    android:layout_below="@+id/txtDescription2">
+    <LinearLayout
+        android:id="@+id/layoutName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtDescription2"
+        android:orientation="horizontal">
 
-    <!--<EditText-->
+        <!--<EditText-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:hint="Mr"-->
@@ -41,49 +45,46 @@
         <!--android:layout_weight="1"-->
         <!--android:inputType="textEmailAddress"-->
         <!--/>-->
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinnerMr"/>
-    <EditText
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:hint="First Name"
-        android:textSize="15dp"
-        android:layout_weight="3"
-    android:layout_marginTop="10dp"
-    android:id="@+id/txtFirstName"
-    android:inputType="textEmailAddress"
-    />
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="Last Name"
-        android:textSize="15dp"
-        android:layout_weight="3"
-        android:layout_marginTop="10dp"
-        android:id="@+id/txtLastName"
-        android:inputType="textEmailAddress"
-        />
+        <Spinner
+            android:id="@+id/spinnerMr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/txtFirstName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="3"
+            android:hint="First Name"
+            android:inputType="textEmailAddress"
+            android:textSize="15dp" />
+
+        <EditText
+            android:id="@+id/txtLastName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="3"
+            android:hint="Last Name"
+            android:inputType="textEmailAddress"
+            android:textSize="15dp" />
 
 
-</LinearLayout>
-
-
+    </LinearLayout>
 
 
     <Button
+        android:id="@+id/btnNameToBirthDay"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:layout_marginTop="30dp"
-        android:text="Next"
-        android:textColor="#fff"
-        android:gravity="center"
-        android:id="@+id/btnNameToBirthDay"
-        android:background="@drawable/mybutton"
         android:layout_below="@+id/layoutName"
-        android:layout_centerHorizontal="true"/>
-
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/mybutton"
+        android:gravity="center"
+        android:text="Next"
+        android:textColor="#fff" />
 
 
 </RelativeLayout>
