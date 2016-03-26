@@ -15,7 +15,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -44,21 +44,24 @@
                 />
         </LinearLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="105dp"
-            android:gravity="bottom"
-            android:id="@+id/confirmedOrdersButton"
-            android:layout_gravity="bottom">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageButton"
-                android:background="@mipmap/icon_confirmed_order"
-                android:layout_gravity="center"
-                android:contentDescription="confirmOrder" />
-        </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:id="@+id/confirmedOrdersButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton"
+            android:background="@mipmap/icon_confirmed_order"
+            android:layout_gravity="center"
+            android:contentDescription="confirmOrder" />
+    </LinearLayout>
+
 </RelativeLayout>
