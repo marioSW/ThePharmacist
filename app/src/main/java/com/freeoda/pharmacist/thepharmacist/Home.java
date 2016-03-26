@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -22,8 +23,8 @@ import java.util.Date;
 
 public class Home extends AppCompatActivity {
 
-    Button button;
-    Button gallery;
+    ImageButton button;
+    ImageButton gallery;
    // ImageView imageView;
     static final int CAM_REQUEST=1;
     static final int SELECT_PICTURE = 2;
@@ -40,9 +41,9 @@ public class Home extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        button=(Button)findViewById(R.id.button2);
+        button=(ImageButton)findViewById(R.id.button2);
         //imageView=(ImageView)findViewById(R.id.image_view);
-        gallery=(Button)findViewById(R.id.button3);
+        gallery=(ImageButton)findViewById(R.id.button3);
 
         gallery.setOnClickListener(
                 new View.OnClickListener() {
