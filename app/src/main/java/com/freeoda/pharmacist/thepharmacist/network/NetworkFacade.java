@@ -23,7 +23,31 @@ public abstract class NetworkFacade {
 
         final UserResponse userResponse = new UserResponse(context);
 
-        userResponse.registerRequest(user,callback);
+        userResponse.registerRequest(user, callback);
+
+    }
+
+    public static void sendEmailPwdReset(final String email,Context context,final NetworkCallback callback){
+
+        final UserResponse userResponse = new UserResponse(context);
+
+        userResponse.resetPwdEmailRequest(email, callback);
+
+    }
+
+    public static void sendCodePwdReset(final String code,Context context,final NetworkCallback callback){
+
+        final UserResponse userResponse = new UserResponse(context);
+
+        userResponse.resetPwdCodeRequest(code, callback);
+
+    }
+
+    public static void resetPassword(final String email,final String pwd,Context context,final NetworkCallback callback){
+
+        final UserResponse userResponse = new UserResponse(context);
+
+        userResponse.resetPasswordRequest(email,pwd,callback);
 
     }
 }
