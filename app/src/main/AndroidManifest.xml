@@ -31,13 +31,15 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".EnterNameActivity"
-            android:label="Enter Name" />
+            android:label="Name" />
         <activity
             android:name=".EnterBirthDayActivity"
-            android:label="Enter BirthDay" />
-        <activity android:name=".EnterPwdActivity" />
+            android:label="BirthDay" />
+        <activity android:name=".EnterPwdActivity"
+            android:label="Password"/>
         <activity android:name=".MainActivity" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".EnterCodeActivity"/>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -51,6 +53,10 @@
         <activity
             android:name=".EnterNumberActivity"
             android:label="Enter Number" />
+
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:label="Password Reset" />
 
         <activity
             android:name=".Home"
