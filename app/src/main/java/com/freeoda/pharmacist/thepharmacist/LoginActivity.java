@@ -40,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
@@ -78,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
+    public static boolean mGooglePlusLogoutClicked;
     private ConnectionResult mConnectionResult;
 
     @Override
@@ -529,5 +531,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+
+    public static void logoutFromGooglePlus() {
+        mGooglePlusLogoutClicked = true;  // Keep track when you click logout
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            revokeAccess();
+
+        } else {
+            mGoogleApiClient.connect();   // It can send user to onConnected(), call logout again from there
+        }
+    }
+
+    // revoke access (if needed)
+    protected static void revokeAccess() {
+
+        Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        mGoogleApiClient.disconnect();
+                        mGoogleApiClient.connect();
+                        // Clear data and go to login activity
+                    }
+                });
+    }
 
 }
