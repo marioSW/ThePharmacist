@@ -1,24 +1,36 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class DisplayImage extends AppCompatActivity {
 
     ImageView imV;
     String path=null;
     String galleryPath=null;
+
+    public static final String UPLOAD_URL = "http://thepharmacist.freeoda.com/upload.php";
+    public static final String UPLOAD_KEY = "image";
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,17 +43,17 @@ public class DisplayImage extends AppCompatActivity {
         galleryPath=bundle.getString("galleryPath");
         imV=(ImageView)findViewById(R.id.image_view1);
         if(path!=null) {
-            setPic(path);
+            bitmap=setPic(path);
         }
         else
         {
-            setGallery(galleryPath);
+            bitmap=setGallery(galleryPath);
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-    private void setPic(String mCurrentPhotoPath) {
+    private Bitmap setPic(String mCurrentPhotoPath) {
 
 		/* There isn't enough memory to open up more than a couple camera photos */
 		/* So pre-scale the target bitmap into which the file is decoded */
@@ -91,12 +103,14 @@ public class DisplayImage extends AppCompatActivity {
         imV.setImageBitmap(bit);
         imV.setVisibility(View.VISIBLE);
 
+        return bit;
+
 
 
 
     }
 
-    private void setGallery(String mCurrentPhotoPath) {
+    private Bitmap setGallery(String mCurrentPhotoPath) {
 
 		/* There isn't enough memory to open up more than a couple camera photos */
 		/* So pre-scale the target bitmap into which the file is decoded */
@@ -129,6 +143,8 @@ public class DisplayImage extends AppCompatActivity {
         imV.setImageBitmap(bitmap);
         imV.setVisibility(View.VISIBLE);
 
+        return bitmap;
+
 
 
 
@@ -141,6 +157,82 @@ public class DisplayImage extends AppCompatActivity {
         retVal = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
 
         return retVal;
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+       /* int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);*/
+
+        switch(item.getItemId())
+        {
+            case R.id.input_id:
+                //Toast.makeText(getApplication(),"Select this image",Toast.LENGTH_LONG).show();
+                getStringImage(bitmap);
+                uploadImage();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    private void uploadImage(){
+        class UploadImage extends AsyncTask<Bitmap,Void,String> {
+
+            ProgressDialog loading;
+            RequestHandler rh = new RequestHandler();
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(DisplayImage.this, "Uploading...", null,true,true);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected String doInBackground(Bitmap... params) {
+                Bitmap bitmap = params[0];
+                String uploadImage = getStringImage(bitmap);
+
+                HashMap<String,String> data = new HashMap<>();
+
+                data.put(UPLOAD_KEY, uploadImage);
+                String result = rh.sendPostRequest(UPLOAD_URL,data);
+
+                return result;
+            }
+        }
+
+        UploadImage ui = new UploadImage();
+        ui.execute(bitmap);
+    }
+    public String getStringImage(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
     }
 
 }
