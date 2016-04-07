@@ -129,4 +129,123 @@ public class UserResponse extends PharmacistEndpoints {
 
         queue.add(request);
     }
+
+
+    public void resetPwdCodeRequest(final String code, final NetworkCallback callback){
+
+        final String TAG = "TAG";
+        Log.i(TAG,code);
+        StringRequest request = new StringRequest(Request.Method.POST,this.SEND_CODE_RESET_PWD,
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d(TAG, response.toString());
+                        Gson gson = new Gson();
+//                        String result = gson.fromJson(response.toString(),);
+//                        callback.onSuccess(user);
+                        com.freeoda.pharmacist.thepharmacist.models.Response response1 = new com.freeoda.pharmacist.thepharmacist.models.Response();
+                        callback.onSuccess(response1);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                HttpExceptionHandler.networkException(error);
+                CustomException exception = new HttpExceptionHandler().networkException(error);
+                callback.onError(exception);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("code",code);
+                return params;
+            }
+        };
+
+        queue.add(request);
+    }
+
+
+    public void resetPwdEmailRequest(final String email, final NetworkCallback callback){
+
+        final String TAG = "TAG";
+
+        StringRequest request = new StringRequest(Request.Method.POST,this.SEND_EMAIL_RESET_PWD,
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d(TAG, response.toString());
+                        Gson gson = new Gson();
+//                        String result = gson.fromJson(response.toString(),);
+                        com.freeoda.pharmacist.thepharmacist.models.Response response1 = new com.freeoda.pharmacist.thepharmacist.models.Response();
+                       callback.onSuccess(response1);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                HttpExceptionHandler.networkException(error);
+                CustomException exception = new HttpExceptionHandler().networkException(error);
+                callback.onError(exception);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("email",email);
+                return params;
+            }
+        };
+
+        queue.add(request);
+    }
+
+
+    public void resetPasswordRequest(final String email,final String pwd, final NetworkCallback callback){
+
+        final String TAG = "TAG";
+
+        StringRequest request = new StringRequest(Request.Method.POST,this.SEND_EMAIL_RESET_PWD,
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d(TAG, response.toString());
+                        Gson gson = new Gson();
+//                        String result = gson.fromJson(response.toString(),);
+                        com.freeoda.pharmacist.thepharmacist.models.Response response1 = new com.freeoda.pharmacist.thepharmacist.models.Response();
+                        callback.onSuccess(response1);
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                HttpExceptionHandler.networkException(error);
+                CustomException exception = new HttpExceptionHandler().networkException(error);
+                callback.onError(exception);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> params = new HashMap<>();
+                params.put("email",email);
+                params.put("newpwd",pwd);
+                return params;
+            }
+        };
+
+        queue.add(request);
+    }
 }

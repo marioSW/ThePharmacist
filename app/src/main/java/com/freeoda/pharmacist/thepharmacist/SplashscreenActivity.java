@@ -30,7 +30,9 @@ public class SplashscreenActivity  extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-
+        if( getIntent().getBooleanExtra("Exit me", false)){
+            finish();
+        }
         // Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 

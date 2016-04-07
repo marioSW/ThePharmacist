@@ -1,9 +1,11 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
+import com.freeoda.pharmacist.thepharmacist.models.User;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkCallback;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
 import com.google.android.gms.auth.api.Auth;
@@ -37,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
@@ -49,18 +53,18 @@ import java.util.Arrays;
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    Button signinGoogleBtn;
-    Button loginBtn;
+    private Button signinGoogleBtn;
+    private Button loginBtn;
     private LoginButton signinFbBtn;
-    EditText username;
-    EditText password;
+    private Button loginCreateAccount;
+    private Button forgotPwd;
+    private EditText username;
+    private EditText password;
     CallbackManager callbackManager;
     private ProgressDialog pDialog;
     String user;
     String pass;
-    private static final String LOGIN_URL = "http://pharmacist.freeoda.com/customerLogin.php";
-    private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
+    final Context context = this;
 
     private static final int RC_SIGN_IN = 9001;// Logcat tag
     private static final String TAG = "LoginActivity";
@@ -75,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
+    public static boolean mGooglePlusLogoutClicked;
     private ConnectionResult mConnectionResult;
 
     @Override
@@ -86,6 +91,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         loginBtn = (Button) findViewById(R.id.login_loginBtn);
+        loginCreateAccount = (Button) findViewById(R.id.login_create_account);
+        forgotPwd = (Button) findViewById(R.id.login_forgot_pwd);
         username = (EditText) findViewById(R.id.login_username);
         password = (EditText) findViewById(R.id.login_password);
         signinGoogleBtn = (Button) findViewById(R.id.googleloginBtn);
@@ -125,13 +132,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     // Application code
                                     try {
                                         JSONObject jobject = new JSONObject(response.getRawResponse());
-                                        String googleFbName = jobject.getString("first_name") + " " + jobject.getString("last_name");
-                                        Log.i("TAG", googleFbName);
+
+                                        User user = new User();
+                                        user.setFirstName(jobject.getString("first_name"));
+                                        user.setLastName((jobject.getString("last_name")));
+                                        user.setBirthDate(jobject.getString("birthday"));
+                                        if (jobject.has("mobile")) {
+                                            user.setMobileNo(jobject.getString("mobile"));
+                                        } else {
+                                            user.setMobileNo("Not_given");
+                                        }
+                                        user.setEmail(jobject.getString("email"));
+                                        user.setPassword("fb_password");
+                                        NetworkFacade.registerUser(user, getApplicationContext(), new NetworkCallback() {
+                                            @Override
+                                            public void onSuccess(ModelApi result) {
+                                                Log.d("TAG", result.toString());
+                                            }
+
+                                            @Override
+                                            public void onError(CustomException exception) {
+
+                                            }
+                                        });
+
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
 
                                     Intent loginIntent = new Intent(LoginActivity.this,Home.class);
+
+                                    SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                                    editor.putString("LoginMethod", "facebook");
+
+                                    editor.commit();
+                                    //Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+
                                     startActivity(loginIntent);
 
 
@@ -169,14 +206,131 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         signinGoogleBtn.setOnClickListener(this);
         loginBtn.setOnClickListener(this);
+        loginCreateAccount.setOnClickListener(this);
+        forgotPwd.setOnClickListener(this);
 
-        Button login_create_account = (Button) findViewById(R.id.login_create_account);
-        login_create_account.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this,EnterNameActivity.class));
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.googleloginBtn: {
+                if (isOnline()) {
+                    signIn();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Connection unavailable", Toast.LENGTH_SHORT).show();
+                }
             }
-        });
+            break;
+            case R.id.login_loginBtn: {
+                user = username.getText().toString();
+                pass = password.getText().toString();
+
+                if (user.equals("")) {
+                    username.setError("Username is required!");
+                } else if (pass.equals("")) {
+                    password.setError("Password is required!");
+                } else {
+
+                    if (isOnline()) {
+                        NetworkFacade.loginUser(user, pass, getApplicationContext(), new NetworkCallback() {
+                            @Override
+                            public void onSuccess(ModelApi result) {
+                                SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putString("LoginMethod", "normal");
+                                editor.commit();
+                                //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                startActivity(new Intent(LoginActivity.this, Home.class));
+
+                            }
+
+                            @Override
+                            public void onError(CustomException exception) {
+                                Toast.makeText(getApplicationContext(), "login failed", Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Connection unavailable!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            }
+            break;
+            case R.id.login_create_account: {
+                startActivity(new Intent(LoginActivity.this, EnterNumberActivity.class));
+            }
+            break;
+            case R.id.login_forgot_pwd: {
+                if (isOnline()) {
+
+                    final Dialog dialog = new Dialog(context);
+                    dialog.setContentView(R.layout.custom_dialog_enter_email);
+                    dialog.setTitle("Reset Password");
+
+
+                    Button dialogButton = (Button) dialog.findViewById(R.id.forgot_pwd_email_btn);
+                    // if button is clicked, close the custom dialog
+                    dialogButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            EditText forgotPwdEmailTxt = (EditText) dialog.findViewById(R.id.forgot_pwd_email);
+                            String x = forgotPwdEmailTxt.getText().toString();
+                            SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                            editor.putString("User", x);
+                            editor.commit();
+                            dialog.dismiss();
+                            // set the custom dialog components
+
+                            Log.i(TAG,x);
+                            NetworkFacade.sendEmailPwdReset(x, getApplicationContext()
+                                    , new NetworkCallback() {
+                                @Override
+                                public void onSuccess(ModelApi result) {
+                                    final Dialog codeDialog = new Dialog(context);
+                                    codeDialog.setContentView(R.layout.custom_dialogbox_enter_code);
+                                    codeDialog.setTitle("Reset Password");
+
+                                    Button codeDialogBtn = (Button) codeDialog.findViewById(R.id.forgot_pwd_btn);
+                                    codeDialogBtn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            EditText forgotPwdCodeTxt = (EditText) codeDialog.findViewById(R.id.forgot_pwd_code);
+                                            NetworkFacade.sendCodePwdReset(forgotPwdCodeTxt.getText().toString(), getApplicationContext(), new NetworkCallback() {
+                                                @Override
+                                                public void onSuccess(ModelApi result) {
+                                                    Log.i(TAG,result.toString());
+                                                    startActivity(new Intent(LoginActivity.this,ResetPasswordActivity.class));
+                                                }
+
+                                                @Override
+                                                public void onError(CustomException exception) {
+
+                                                }
+                                            });
+                                        }
+                                    });
+                                    codeDialog.show();
+                                }
+
+                                @Override
+                                public void onError(CustomException exception) {
+
+                                }
+                            });
+
+                        }
+                    });
+
+                    dialog.show();
+                } else {
+                    Toast.makeText(getApplication(), "Connection unavailble", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
 
@@ -207,38 +361,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.googleloginBtn: {
-                if (isOnline()) {
-                    signIn();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Connection unavailble", Toast.LENGTH_SHORT).show();
-                }
-            }
-            break;
-            case R.id.login_loginBtn: {
-                user = username.getText().toString();
-                pass = password.getText().toString();
-
-                NetworkFacade.loginUser(user, pass, getApplicationContext(), new NetworkCallback() {
-                    @Override
-                    public void onSuccess(ModelApi result) {
-                        startActivity(new Intent(LoginActivity.this, Home.class));
-                    }
-
-                    @Override
-                    public void onError(CustomException exception) {
-                        Toast.makeText(getApplicationContext(), "login failed", Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
-            }
-        }
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult result) {
         if (!result.hasResolution()) {
             GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
@@ -265,26 +387,45 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.i("TAG", "Google API connected");
         super.onStart();
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-        if (opr.isDone()) {
-            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-            // and the GoogleSignInResult will be available instantly.
-            Log.d(TAG, "Got cached sign-in");
-            GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+
+        if (mGooglePlusLogoutClicked) {
+            logoutFromGooglePlus();
+            mGooglePlusLogoutClicked = false;
+            mGoogleApiClient.disconnect();
         } else {
-            // If the user has not previously signed in on this device or the sign-in has expired,
-            // this asynchronous branch will attempt to sign in the user silently.  Cross-device
-            // single sign-on will occur in this branch.
-            showProgressDialog();
-            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                @Override
-                public void onResult(GoogleSignInResult googleSignInResult) {
-                    hideProgressDialog();
-                    handleSignInResult(googleSignInResult);
-                }
-            });
+//            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+//            if (opr.isDone()) {
+//                // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+//                // and the GoogleSignInResult will be available instantly.
+//                Log.d(TAG, "Got cached sign-in");
+//                GoogleSignInResult result = opr.get();
+//                handleSignInResult(result);
+//            } else {
+//                // If the user has not previously signed in on this device or the sign-in has expired,
+//                // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+//                // single sign-on will occur in this branch.
+//                showProgressDialog();
+//                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+//                    @Override
+//                    public void onResult(GoogleSignInResult googleSignInResult) {
+//                        hideProgressDialog();
+//                        handleSignInResult(googleSignInResult);
+//                    }
+//                });
+            //}
+
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("Exit me", true);
+        startActivity(intent);
+        finish();
     }
 
     protected void onStop() {
@@ -321,11 +462,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            String name = acct.getDisplayName();
-            //googleFbName = acct.getDisplayName();
+
+            User user = new User();
+            String name[] = acct.getDisplayName().split(" ");
+            //Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+            user.setFirstName(name[0]);
+            user.setLastName(name[1]);
+            user.setEmail(acct.getEmail());
+            user.setBirthDate("not specified");
+            user.setMobileNo("not specified");
+            user.setPassword("google_pwd");
+
+            NetworkFacade.registerUser(user, getApplicationContext(), new NetworkCallback() {
+                @Override
+                public void onSuccess(ModelApi result) {
+                    Log.d("TAG", result.toString());
+                }
+
+                @Override
+                public void onError(CustomException exception) {
+
+                }
+            });
             //getProfileInformation();
-            Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+
+            SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            editor.putString("LoginMethod", "google");
+            editor.commit();
+
+            //Intent i = new Intent(LoginActivity.this, MainActivity.class);
+            //Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
             Intent i = new Intent(LoginActivity.this, Home.class);
+
             startActivity(i);
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             //updateUI(true);
@@ -362,5 +531,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+
+    public static void logoutFromGooglePlus() {
+        mGooglePlusLogoutClicked = true;  // Keep track when you click logout
+        if (mGoogleApiClient.isConnected()) {
+            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            revokeAccess();
+
+        } else {
+            mGoogleApiClient.connect();   // It can send user to onConnected(), call logout again from there
+        }
+    }
+
+    // revoke access (if needed)
+    protected static void revokeAccess() {
+
+        Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        mGoogleApiClient.disconnect();
+                        mGoogleApiClient.connect();
+                        // Clear data and go to login activity
+                    }
+                });
+    }
 
 }
