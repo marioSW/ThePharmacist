@@ -5,7 +5,7 @@ package com.freeoda.pharmacist.thepharmacist.network;
  */
 public interface NetworkApi {
 
-    String PHARMACIST_URL = "http://pharmacist2016.netau.net/";
+    String PHARMACIST_URL = "http://thepharmacist.freeoda.com/";
 }
 
 

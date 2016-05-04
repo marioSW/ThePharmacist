@@ -52,21 +52,21 @@ public class EnterNumberActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedpreferences.edit();
                     editor.putString("mobile",txtMobileNo.getText().toString() );
                     editor.commit();
-                    startActivity(new Intent(EnterNumberActivity.this, EnterNameActivity.class));
+                    startActivity(new Intent(EnterNumberActivity.this, EnterEmailActivity.class));
                 }
             }
         });
 
-        Button btnMobileNumber  =(Button)findViewById(R.id.txtEnterMobileNumberButton);
-        btnMobileNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                    //global.personDetails.setMobileNo(txtMobileNo.getText().toString());
-                    startActivity(new Intent(EnterNumberActivity.this, EnterEmailActivity.class));
-
-                }
-
-        });
+//        Button btnMobileNumber  =(Button)findViewById(R.id.txtEnterMobileNumberButton);
+//        btnMobileNumber.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                    //global.personDetails.setMobileNo(txtMobileNo.getText().toString());
+//                    startActivity(new Intent(EnterNumberActivity.this, EnterEmailActivity.class));
+//
+//                }
+//
+//        });
 
 
     }

@@ -17,13 +17,13 @@ public class EnterEmailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_enter_email);
 
         final EditText txtEmail = (EditText) findViewById(R.id.txtEmail1);
-        Button btnMobile = (Button) findViewById(R.id.btnSignUpWithMobile);
-        btnMobile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        //Button btnMobile = (Button) findViewById(R.id.btnSignUpWithMobile);
+//        btnMobile.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onBackPressed();
+//            }
+//        });
 
         Button btnMobileNo = (Button) findViewById(R.id.btnEmailToMobileNo);
         btnMobileNo.setOnClickListener(new View.OnClickListener() {
