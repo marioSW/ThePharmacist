@@ -15,6 +15,10 @@ import com.freeoda.pharmacist.thepharmacist.exceptions.HttpExceptionHandler;
 import com.freeoda.pharmacist.thepharmacist.models.User;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +45,22 @@ public class UserResponse extends PharmacistEndpoints {
                     public void onResponse(String response) {
 
                         Log.d(TAG, response.toString());
+
                         Gson gson = new Gson();
                         User user = gson.fromJson(response.toString(), User.class);
-                        callback.onSuccess(user);
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String i = jsonObject.getString("success");
+                            Log.i("TAG status",i);
+                            if(i.equals("1")){ callback.onSuccess(user);}
+                            else{callback.onError(exception); }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("TAG output",user.toString());
+//                        if(user.getStatusCode().toString().equals("1")) {
+//                            callback.onSuccess(user);
+//                        }
 
                     }
                 }, new Response.ErrorListener() {
@@ -59,8 +76,10 @@ public class UserResponse extends PharmacistEndpoints {
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String,String> params = new HashMap<>();
-                params.put("password",password);
-                params.put("email",email);
+                Log.i("sending TAG",email);
+                Log.i("sending TAG",password);
+                params.put("pass",password);
+                params.put("user",email);
                 return params;
             }
         };
@@ -214,13 +233,13 @@ public class UserResponse extends PharmacistEndpoints {
 
         final String TAG = "TAG";
 
-        StringRequest request = new StringRequest(Request.Method.POST,this.SEND_EMAIL_RESET_PWD,
+        StringRequest request = new StringRequest(Request.Method.POST,this.RESET_PWD,
                 new Response.Listener<String>() {
 
                     @Override
                     public void onResponse(String response) {
 
-                        Log.d(TAG, response.toString());
+                        Log.d(TAG+"pwd reset", response.toString());
                         Gson gson = new Gson();
 //                        String result = gson.fromJson(response.toString(),);
                         com.freeoda.pharmacist.thepharmacist.models.Response response1 = new com.freeoda.pharmacist.thepharmacist.models.Response();

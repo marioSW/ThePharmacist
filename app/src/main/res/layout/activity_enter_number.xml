@@ -61,7 +61,7 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/btnMobileNo"/>
 
-    <Button
+    <!--<Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#fff"
@@ -69,7 +69,7 @@
         android:layout_alignParentBottom="true"
         android:textColor="@color/colorPrimary"
         android:id="@+id/txtEnterMobileNumberButton"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"/>-->
 
 </RelativeLayout>
 
