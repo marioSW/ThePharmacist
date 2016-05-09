@@ -1,9 +1,11 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
+import com.freeoda.pharmacist.thepharmacist.models.User;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkCallback;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
 import com.google.android.gms.auth.api.Auth;
