@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
@@ -21,6 +22,7 @@ import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.zip.Inflater;
 
 public class DisplayImage extends AppCompatActivity {
 
@@ -36,6 +38,7 @@ public class DisplayImage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_image);
+
         //Get the bundle
         Bundle bundle = getIntent().getExtras();
         //Extract the data…
@@ -49,6 +52,15 @@ public class DisplayImage extends AppCompatActivity {
         {
             bitmap=setGallery(galleryPath);
         }
+        Toast.makeText(getApplicationContext(),"Bit is:"+bitmap,Toast.LENGTH_LONG).show();
+        imV.setImageBitmap(bitmap);
+        imV.setScaleType(ImageView.ScaleType.FIT_XY);
+        //imV.setVisibility(View.VISIBLE);
+
+        RelativeLayout lay= (RelativeLayout) findViewById(R.id.displayImageLayout);
+        View view=getLayoutInflater().inflate(R.layout.content_display_image,null);
+        lay.addView(view);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -88,9 +100,12 @@ public class DisplayImage extends AppCompatActivity {
             ei = new ExifInterface(mCurrentPhotoPath);
         } catch (IOException e) {
             e.printStackTrace();
+            //test
+
         }
         int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
         Bitmap bit=null;
+
         switch(orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 bit=rotateImage(bitmap, 90);
@@ -98,10 +113,11 @@ public class DisplayImage extends AppCompatActivity {
             case ExifInterface.ORIENTATION_ROTATE_180:
                 bit=rotateImage(bitmap, 180);
                 break;
+            default:
+                bit=rotateImage(bitmap,0);
+                break;
             // etc.
         }
-        imV.setImageBitmap(bit);
-        imV.setVisibility(View.VISIBLE);
 
         return bit;
 
@@ -139,10 +155,11 @@ public class DisplayImage extends AppCompatActivity {
 
 		/* Decode the JPEG file into a Bitmap */
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		/* Associate the Bitmap to the ImageView */
+
+		/* Associate the Bitmap to the ImageView
         imV.setImageBitmap(bitmap);
         imV.setVisibility(View.VISIBLE);
-
+*/
         return bitmap;
 
 
