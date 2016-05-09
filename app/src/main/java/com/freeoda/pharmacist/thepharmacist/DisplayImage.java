@@ -1,12 +1,18 @@
 package com.freeoda.pharmacist.thepharmacist;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -14,15 +20,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.zip.Inflater;
 
 public class DisplayImage extends AppCompatActivity {
 
@@ -32,35 +39,46 @@ public class DisplayImage extends AppCompatActivity {
 
     public static final String UPLOAD_URL = "http://thepharmacist.freeoda.com/upload.php";
     public static final String UPLOAD_KEY = "image";
-    private Bitmap bitmap;
+    public Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_image);
-
         //Get the bundle
         Bundle bundle = getIntent().getExtras();
+        bitmap=null;
         //Extract the data…
         path =bundle.getString("filePath");
-        galleryPath=bundle.getString("galleryPath");
+        galleryPath=bundle.getString("imageUri");
         imV=(ImageView)findViewById(R.id.image_view1);
         if(path!=null) {
-            bitmap=setPic(path);
+         //   bitmap=setPic(path);
+
+            // Uri imageUri = Uri.parse("http://my-site.com/my-image.jpg");
+            Uri imageUri1 = Uri.parse(path);
+            Intent imageEditorIntent1 = new AdobeImageIntent.Builder(this)
+                    .setData(imageUri1)
+                    .build();
+
+            startActivityForResult(imageEditorIntent1,2);
         }
         else
         {
-            bitmap=setGallery(galleryPath);
+
+          //  bitmap=setGallery(galleryPath);
+         //   Toast.makeText(getApplicationContext(),galleryPath,Toast.LENGTH_LONG).show();
+           // Bundle bundle = getIntent().getExtras();
+            // Uri imageUri = Uri.parse("http://my-site.com/my-image.jpg");
+            Uri imageUri = Uri.parse(galleryPath);
+
+            Intent imageEditorIntent = new AdobeImageIntent.Builder(this)
+                    .setData(imageUri)
+                    .build();
+
+            startActivityForResult(imageEditorIntent, 1);
+
         }
-        Toast.makeText(getApplicationContext(),"Bit is:"+bitmap,Toast.LENGTH_LONG).show();
-        imV.setImageBitmap(bitmap);
-        imV.setScaleType(ImageView.ScaleType.FIT_XY);
-        //imV.setVisibility(View.VISIBLE);
-
-        RelativeLayout lay= (RelativeLayout) findViewById(R.id.displayImageLayout);
-        View view=getLayoutInflater().inflate(R.layout.content_display_image,null);
-        lay.addView(view);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -93,28 +111,22 @@ public class DisplayImage extends AppCompatActivity {
         bmOptions.inPurgeable = true;
 
 		/* Decode the JPEG file into a Bitmap */
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 		/* Associate the Bitmap to the ImageView */
         ExifInterface ei = null;
         try {
             ei = new ExifInterface(mCurrentPhotoPath);
         } catch (IOException e) {
             e.printStackTrace();
-            //test
-
         }
         int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
         Bitmap bit=null;
-
         switch(orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 bit=rotateImage(bitmap, 90);
                 break;
             case ExifInterface.ORIENTATION_ROTATE_180:
                 bit=rotateImage(bitmap, 180);
-                break;
-            default:
-                bit=rotateImage(bitmap,0);
                 break;
             // etc.
         }
@@ -155,11 +167,9 @@ public class DisplayImage extends AppCompatActivity {
 
 		/* Decode the JPEG file into a Bitmap */
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-
-		/* Associate the Bitmap to the ImageView
+		/* Associate the Bitmap to the ImageView */
         imV.setImageBitmap(bitmap);
-        imV.setVisibility(View.VISIBLE);
-*/
+
         return bitmap;
 
 
@@ -199,7 +209,6 @@ public class DisplayImage extends AppCompatActivity {
         switch(item.getItemId())
         {
             case R.id.input_id:
-                //Toast.makeText(getApplication(),"Select this image",Toast.LENGTH_LONG).show();
                 getStringImage(bitmap);
                 uploadImage();
                 return true;
@@ -208,6 +217,8 @@ public class DisplayImage extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    //Upload image to server
     private void uploadImage(){
         class UploadImage extends AsyncTask<Bitmap,Void,String> {
 
@@ -244,12 +255,62 @@ public class DisplayImage extends AppCompatActivity {
         UploadImage ui = new UploadImage();
         ui.execute(bitmap);
     }
+
+    //Enocode image to String
     public String getStringImage(Bitmap bmp){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+
+                /* 4) Make a case for the request code we passed to startActivityForResult() */
+                case 1:
+                    //Show image to image Viewer and case 1 for Gallery
+                    Uri editedImageUri = data.getData();
+                    imV.setImageURI(editedImageUri);
+                    setBitmap();
+                    break;
+                case 2:
+                    //Show image to image Viewer and case 2 for Camera
+                    imV.setImageURI(data.getData());
+                    setBitmap();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void setBitmap()
+    {
+        bitmap =((BitmapDrawable)imV.getDrawable()).getBitmap();
+        bitmap=getResizedBitmap(bitmap,640);
+    }
+
+    public Bitmap getResizedBitmap(Bitmap imag,int maxSize)
+    {
+        int width=imag.getWidth();
+        int height=imag.getHeight();
+        float bitmapRatio=(float)width/(float)height;
+        if(bitmapRatio>1)
+        {
+            width=maxSize;
+            height=(int)(width / bitmapRatio);
+        }
+        else{
+            height=maxSize;
+            width=(int)(height*bitmapRatio);
+
+        }
+
+        return Bitmap.createScaledBitmap(imag,width,height,true);
+
     }
 
 }
