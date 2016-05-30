@@ -121,10 +121,17 @@ public class Home extends AppCompatActivity {
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
                 //setPic(selectedImagePath);
-                Intent i = new Intent(this, DisplayImage.class);
+               // Intent i = new Intent(this, DisplayImage.class);
+                //Create the bundle
+               // Bundle bundle = new Bundle();
+               // bundle.putString("galleryPath",selectedImagePath);
+               // i.putExtras(bundle);
+               // startActivity(i);
+
+                Intent i=new Intent(this,DisplayImage.class);
                 //Create the bundle
                 Bundle bundle = new Bundle();
-                bundle.putString("galleryPath",selectedImagePath);
+                bundle.putString("imageUri",selectedImageUri.toString());
                 i.putExtras(bundle);
                 startActivity(i);
             }

@@ -1,4 +1,4 @@
-package com.freeoda.pharmacist.thepharmacist;
+package com.freeoda.pharmacist.thepharmacist.registeruser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.freeoda.pharmacist.thepharmacist.R;
 
 public class EnterEmailActivity extends AppCompatActivity {
 
@@ -29,7 +31,7 @@ public class EnterEmailActivity extends AppCompatActivity {
         btnMobileNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //global.personDetails.setEmail(txtEmail.getText().toString());
+                //LoginSession.personDetails.setEmail(txtEmail.getText().toString());
                 if (txtEmail.getText().toString().equals("")) {
                     txtEmail.setError("Please enter Mobile Number");
                 } else {
