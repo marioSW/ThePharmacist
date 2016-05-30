@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "357206343502",
+    "project_id": "the-pharmacist"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357206343502:android:ca9b7156934234c8",
+        "android_client_info": {
+          "package_name": "com.freeoda.pharmacist.thepharmacist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7GOe6JNFBMyS9VCtLUpdiW3E5FFBK1To"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

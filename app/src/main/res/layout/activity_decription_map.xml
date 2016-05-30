@@ -1,0 +1,155 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:background="@color/feed_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/descLinear1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_parent_rounded_corner"
+        android:padding="5dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/durationTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30min"
+            android:textSize="20sp"
+            android:textColor="@color/pumpkin"/>
+
+        <TextView
+            android:id="@+id/toTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/durationTxt"
+            android:layout_marginLeft="10dp"
+            android:text="to"
+            android:textSize="20sp"/>
+
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:id="@+id/pharName"
+             android:text="NFTH"
+             android:layout_marginLeft="10dp"
+             android:layout_toRightOf="@+id/toTxt"
+             android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/distanceTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="300m away"
+            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/durationTxt"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_marginTop="80dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        tools:context="com.freeoda.pharmacist.thepharmacist.DecriptionMapActivity" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_parent_rounded_corner"
+        android:padding="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/presImage"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:background="@color/pumpkin"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/orderNoLbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Order No:"
+            android:textSize="20sp"
+            android:layout_toRightOf="@+id/presImage"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/orderNoTxt"
+            android:text="ORDER002"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/orderNoLbl"
+            android:textSize="20sp"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentRight="true"/>
+
+         <TextView
+             android:id="@+id/billamountLbl"
+             android:layout_below="@+id/orderNoLbl"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="Total:"
+             android:textSize="18sp"
+             android:layout_marginTop="5dp"
+             android:layout_toRightOf="@+id/presImage"
+             android:layout_marginLeft="5dp"/>
+
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:id="@+id/billamountTxt"
+             android:layout_below="@id/orderNoTxt"
+             android:text="Rs 700"
+             android:layout_marginTop="5dp"
+             android:layout_toRightOf="@+id/orderNoLbl"
+             android:textSize="20sp"
+             android:layout_marginLeft="5dp"
+             android:layout_alignParentRight="true"/>
+
+        <com.freeoda.pharmacist.thepharmacist.AutoButtonEffector
+            android:id="@+id/descAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_toRightOf="@+id/presImage"
+            android:layout_marginLeft="5dp"
+            android:layout_below="@+id/billamountLbl"
+            android:text="Accept"
+            android:textColor="@color/white"
+
+            android:background="@drawable/accept_back" />
+
+            <com.freeoda.pharmacist.thepharmacist.AutoButtonEffector
+                android:id="@+id/descDecline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_toRightOf="@+id/descAccept"
+                android:layout_marginLeft="10dp"
+                android:layout_below="@+id/billamountLbl"
+                android:text="Decline"
+                android:textColor="@color/white"
+                android:background="@drawable/decline_back" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</FrameLayout>
+
