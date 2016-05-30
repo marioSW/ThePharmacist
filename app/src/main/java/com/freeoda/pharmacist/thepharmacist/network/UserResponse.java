@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.freeoda.pharmacist.thepharmacist.LoginSession;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.exceptions.HttpExceptionHandler;
 import com.freeoda.pharmacist.thepharmacist.models.User;
@@ -34,7 +35,7 @@ public class UserResponse extends PharmacistEndpoints {
         queue = Volley.newRequestQueue(applicationContext);
     }
 
-    public void loginRequest(final String email, final String password,final NetworkCallback callback){
+    public void loginRequest(final String email, final String password,final String regId, final NetworkCallback callback){
 
         final String TAG = "TAG";
 
@@ -51,6 +52,9 @@ public class UserResponse extends PharmacistEndpoints {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String i = jsonObject.getString("success");
+                            User u = new User();
+                            u.setEmail(jsonObject.getString("loggin_info_username"));
+                            LoginSession.personDetails = u;
                             Log.i("TAG status",i);
                             if(i.equals("1")){ callback.onSuccess(user);}
                             else{callback.onError(exception); }
@@ -78,8 +82,10 @@ public class UserResponse extends PharmacistEndpoints {
                 HashMap<String,String> params = new HashMap<>();
                 Log.i("sending TAG",email);
                 Log.i("sending TAG",password);
-                params.put("pass",password);
+                Log.i("sending TAG-----------",regId);
+                params.put("pass", password);
                 params.put("user",email);
+                params.put("regId",regId);
                 return params;
             }
         };

@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="40dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="easytoget.com.design.Home"
     tools:showIn="@layout/activity_home"
@@ -12,30 +14,50 @@
     >
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_centerHorizontal="true">
 
-        >
+        <ImageButton
+            android:id="@+id/button2"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/round_button"
+            android:src="@mipmap/camera_icon"
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/button3"
+            android:layout_marginTop="50dp"
+            android:textColor="#fff" />
 
-    <ImageButton
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@drawable/round_button"
-        android:textColor="#fff"
-        android:id="@+id/button2"
-        android:layout_marginRight="20dp"
-        android:src="@mipmap/camera_icon"
-        />
-    <ImageButton
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@drawable/round_button"
-        android:textColor="#fff"
-        android:id="@+id/button3"
-        android:src="@mipmap/gallery_icon"
-        android:layout_toEndOf="@+id/button2"
-        />
+        <ImageButton
+            android:id="@+id/button3"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/curve_button"
+            android:src="@mipmap/gallery_icon"
+            android:textColor="#fff"
+            android:layout_alignParentLeft="true"/>
+
+        <ImageButton
+            android:id="@+id/notificationBtn"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginRight="20dp"
+            android:layout_toRightOf="@+id/button3"
+            android:background="@drawable/curve_button"
+            android:src="@mipmap/notification_icon" />
+
+
+        <ImageButton
+            android:id="@+id/testBtn1"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_toRightOf="@+id/notificationBtn"
+            android:background="@drawable/curve_button"
+            android:src="@mipmap/map_icon" />
+
     </RelativeLayout>
 
 </RelativeLayout>

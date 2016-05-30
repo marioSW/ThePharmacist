@@ -11,11 +11,11 @@ import com.freeoda.pharmacist.thepharmacist.models.User;
  */
 public abstract class NetworkFacade {
 
-    public static void loginUser(final String email, String password,Context context,final NetworkCallback callback){
+    public static void loginUser(final String email, String password,final String regId,Context context,final NetworkCallback callback){
 
         final UserResponse userResponse = new UserResponse(context);
 
-        userResponse.loginRequest(email, password,callback);
+        userResponse.loginRequest(email, password, regId, callback);
 
     }
 
@@ -47,7 +47,27 @@ public abstract class NetworkFacade {
 
         final UserResponse userResponse = new UserResponse(context);
 
-        userResponse.resetPasswordRequest(email,pwd,callback);
+        userResponse.resetPasswordRequest(email, pwd, callback);
+
+    }
+
+    public static void getOrders(final String username,Context context,final  NetworkCallbackWithArray callback){
+
+        final OrderResponse orderResponse = new OrderResponse(context);
+        orderResponse.getConfirmedOrders(username, callback);
+    }
+
+    public static void confirmUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
+
+        final OrderResponse orderResponse = new OrderResponse(context);
+        orderResponse.userConfirmOrder(pharId, orderId, callback);
+
+    }
+
+    public static void declineUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
+
+        final OrderResponse orderResponse = new OrderResponse(context);
+        orderResponse.userConfirmOrder(pharId,orderId,callback);
 
     }
 }

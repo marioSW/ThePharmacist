@@ -1,17 +1,20 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -19,12 +22,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
+import com.freeoda.pharmacist.thepharmacist.exceptions.HttpExceptionHandler;
+import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
+import com.freeoda.pharmacist.thepharmacist.models.Order;
+import com.freeoda.pharmacist.thepharmacist.network.NetworkCallbackWithArray;
+import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
+import com.freeoda.pharmacist.thepharmacist.registeruser.EnterNumberActivity;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,6 +41,8 @@ public class Home extends AppCompatActivity {
 
     ImageButton button;
     ImageButton gallery;
+    ImageButton notification;
+    ImageButton viewMap;
    // ImageView imageView;
     static final int CAM_REQUEST=1;
     static final int SELECT_PICTURE = 2;
@@ -49,6 +60,9 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         button=(ImageButton)findViewById(R.id.button2);
+        notification = (ImageButton)findViewById(R.id.notificationBtn);
+        viewMap = (ImageButton)findViewById(R.id.testBtn1);
+
         //imageView=(ImageView)findViewById(R.id.image_view);
         gallery=(ImageButton)findViewById(R.id.button3);
 
@@ -79,13 +93,26 @@ public class Home extends AppCompatActivity {
                     }
                 }
         );
+
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this, ViewConfirmedOrdersActivity.class));
+            }
+        });
+
+        viewMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this,ViewOrdersOnMap.class));
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
-
-
 
     private File createImageFile()
     {
@@ -221,6 +248,4 @@ public class Home extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }
