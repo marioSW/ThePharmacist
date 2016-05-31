@@ -54,20 +54,20 @@ public abstract class NetworkFacade {
     public static void getOrders(final String username,Context context,final  NetworkCallbackWithArray callback){
 
         final OrderResponse orderResponse = new OrderResponse(context);
-        orderResponse.getConfirmedOrders(username,callback);
+        orderResponse.getConfirmedOrders(username, callback);
     }
 
-    public static void confirmUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
+    public static void confirmUserOrder(final String pharId,final String orderId,final String choice,Context context,final NetworkCallback callback){
 
         final OrderResponse orderResponse = new OrderResponse(context);
-        orderResponse.userConfirmOrder(pharId, orderId, callback);
+        orderResponse.userConfirmOrder(pharId, orderId, choice, callback);
 
     }
 
     public static void declineUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
 
         final OrderResponse orderResponse = new OrderResponse(context);
-        orderResponse.userConfirmOrder(pharId,orderId,callback);
+        orderResponse.userDeclineOrder(pharId, orderId, callback);
 
     }
 }

@@ -2,6 +2,7 @@ package com.freeoda.pharmacist.thepharmacist.network;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -10,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.freeoda.pharmacist.thepharmacist.ViewConfirmedOrdersActivity;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.exceptions.HttpExceptionHandler;
 import com.freeoda.pharmacist.thepharmacist.models.Order;
@@ -67,7 +69,7 @@ public class OrderResponse extends PharmacistEndpoints{
     }
 
 
-    public void userConfirmOrder(final String pharId,final String orderId, final NetworkCallback callback){
+    public void userConfirmOrder(final String pharId,final String orderId,final String choice, final NetworkCallback callback){
 
         final String TAG = "TAG";
 
@@ -99,6 +101,7 @@ public class OrderResponse extends PharmacistEndpoints{
                 HashMap<String,String> params = new HashMap<>();
                 params.put("pharId",pharId);
                 params.put("orderId",orderId);
+                params.put("choice",choice);
                 return params;
             }
         };

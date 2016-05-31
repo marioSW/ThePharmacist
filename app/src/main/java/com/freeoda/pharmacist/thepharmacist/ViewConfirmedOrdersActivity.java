@@ -34,6 +34,8 @@ public class ViewConfirmedOrdersActivity extends AppCompatActivity implements Vi
     ListView listProduct;
     ArrayList<Order> records;
     ArrayList<Order> recordList = new ArrayList<Order>();
+    String[] choice = new String[]{"Collection","Delivery"};
+    int pickupChoice=0;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +67,12 @@ public class ViewConfirmedOrdersActivity extends AppCompatActivity implements Vi
 
                         records.add(confirmedOrder);
                     }
+
                     adapter = new ViewOrderCustomAdapter(context, R.layout.display_order_custom_row, R.id.orderPharmacyName, records);
                     adapter.setCustomButtonListner(ViewConfirmedOrdersActivity.this);
 
                     listProduct.setAdapter(adapter);
+
                     System.out.println("size" + records.size());
                 }
 
@@ -91,21 +95,45 @@ public class ViewConfirmedOrdersActivity extends AppCompatActivity implements Vi
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("Are you sure,You want to confirm?");
 
-        alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
                 Toast.makeText(ViewConfirmedOrdersActivity.this,"You clicked yes button", Toast.LENGTH_LONG).show();
-                NetworkFacade.confirmUserOrder(value.getPharmacyId(), value.getOrderId(), getApplicationContext(), new NetworkCallback() {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder.setTitle("PickUP or Delivery");
+                alertDialogBuilder.setSingleChoiceItems(choice, 0, null);
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(ModelApi result) {
-                        System.out.print(result);
-                    }
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String pickup = "";
+                        AlertDialog alert = (AlertDialog) dialogInterface;
+                        int p = alert.getListView().getCheckedItemPosition();
+                        if (p == 0) {
+                            pickup = "Collection";
+                        } else if (p == 1) {
+                            pickup = "Delivery";
+                        }
 
-                    @Override
-                    public void onError(CustomException exception) {
+                        NetworkFacade.confirmUserOrder(value.getPharmacyId(), value.getOrderId(), pickup, getApplicationContext(), new NetworkCallback() {
+                            @Override
+                            public void onSuccess(ModelApi result) {
+                                System.out.print(result);
+                                finish();
+                                startActivity(new Intent(ViewConfirmedOrdersActivity.this,ViewConfirmedOrdersActivity.class));
+                            }
 
+                            @Override
+                            public void onError(CustomException exception) {
+
+                            }
+                        });
                     }
                 });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                alertDialog.show();
+                //pickupChoice = alertDialog.getListView().getSelectedItemPosition();
             }
         });
 
@@ -116,6 +144,7 @@ public class ViewConfirmedOrdersActivity extends AppCompatActivity implements Vi
                     @Override
                     public void onSuccess(ModelApi result) {
                         System.out.print(result);
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -163,4 +192,5 @@ public class ViewConfirmedOrdersActivity extends AppCompatActivity implements Vi
         intent.putExtra("Order",(Serializable)value);
         startActivity(intent);
     }
+
 }

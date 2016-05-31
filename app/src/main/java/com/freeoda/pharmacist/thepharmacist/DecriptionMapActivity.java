@@ -3,6 +3,7 @@ package com.freeoda.pharmacist.thepharmacist;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -90,6 +92,8 @@ public class DecriptionMapActivity extends FragmentActivity implements GoogleApi
     Context context =this;
     Activity activity=this;
     Button confirm,decline;
+    String[] choice = new String[]{"Collection","Delivery"};
+    int pickupChoice=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,17 +269,36 @@ public class DecriptionMapActivity extends FragmentActivity implements GoogleApi
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NetworkFacade.confirmUserOrder(order.getPharmacyId(), order.getOrderId(), getApplicationContext(), new NetworkCallback() {
+                Toast.makeText(DecriptionMapActivity.this,"You clicked yes button", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder.setTitle("PickUP or Delivery");
+                alertDialogBuilder.setSingleChoiceItems(choice, 0, null);
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(ModelApi result) {
-                        System.out.print(result);
-                    }
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String pickup="";
+                        AlertDialog alert = (AlertDialog) dialogInterface;
+                        int p = alert.getListView().getCheckedItemPosition();
+                        if (p == 0) {pickup = "Collection";
+                        }else if(p == 1){ pickup = "Delivery";}
 
-                    @Override
-                    public void onError(CustomException exception) {
+                        NetworkFacade.confirmUserOrder(order.getPharmacyId(), order.getOrderId(),pickup, getApplicationContext(), new NetworkCallback() {
+                            @Override
+                            public void onSuccess(ModelApi result) {
+                                System.out.print(result);
+                            }
 
+                            @Override
+                            public void onError(CustomException exception) {
+
+                            }
+                        });
                     }
                 });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                //pickupChoice = alertDialog.getListView().getSelectedItemPosition();
+                alertDialog.show();
             }
         });
 

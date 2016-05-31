@@ -68,9 +68,6 @@
             android:name=".ViewConfirmedOrdersActivity"
             android:label="Confirmed Orders" />
         <activity
-            android:name=".ViewOrderDescriptionActivity"
-            android:label="Order in detail" />
-        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
