@@ -1,16 +1,27 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.ExifInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,11 +37,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
 import com.yalantis.contextmenu.lib.MenuObject;
 import com.yalantis.contextmenu.lib.MenuParams;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemLongClickListener;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,6 +57,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 //import com.adobe.creativesdk.aviary.AdobeImageIntent;
 
@@ -77,6 +96,19 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
     String uploadImage=null;
 
 
+    //Get current location
+    LocationManager lm;
+    String provider;
+    Location l;
+    double latitude=0.0;
+    double longitude=0.0;
+
+    JSONObject jsonObject;
+    JSONArray jsonArray;
+    ProgressDialog prgDialog;
+    String OrderID=null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +144,13 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
             Uri imageUriFromBack = Uri.parse(pathFromBack);
             imV.setImageURI(imageUriFromBack);
         }
+
+        //Retrieve Data from Server
+        prgDialog = new ProgressDialog(this);
+        // Set Progress Dialog Text
+        prgDialog.setMessage("Please wait...");
+        // Set Cancelable as False
+        prgDialog.setCancelable(false);
 
 
     }
@@ -152,7 +191,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 
         }
         getStringImage(bitmap);
-        user_id="TIGER0003";
+        user_id="CHECK_USER_001";
         uploadImage = getStringImage(bitmap);
     }
 
@@ -208,10 +247,27 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
        // Toast.makeText(this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show();
         if(position==1)
         {
-            getStringImage(bitmap);
-            user_id="TIGER0003";
-            uploadImage = getStringImage(bitmap);
-            //uploadImage(user_id);
+//            getStringImage(bitmap);
+//          user_id="TIGER0003";
+//          uploadImage = getStringImage(bitmap);
+//          uploadImage(user_id);
+            if(haveNetworkConnection()) {
+                if(checkGPS()) {
+                    OrderID=generateOrderId();
+                    autoSendPrescription();
+                    user_id = "CHECK_USER_001";
+                    uploadImage = getStringImage(bitmap);
+                    uploadImage(user_id,OrderID);
+                }
+                else {
+                    GPSValidater();
+                }
+            }
+            else
+            {
+                internetFailureDialog();
+            }
+
         }
         else if(position==2)
         {
@@ -233,8 +289,8 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
         }
         else if(position==6)
         {
-            Intent i=new Intent(this,GridViewImage.class);
-            startActivity(i);
+//            Intent i=new Intent(this,GridViewImage.class);
+//            startActivity(i);
         }
         else if(position==7)
         {
@@ -281,7 +337,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
         MenuObject close = new MenuObject();
         close.setResource(R.drawable.close_ping_icon);
 
-        MenuObject send = new MenuObject("Send Prescriptions");
+        MenuObject send = new MenuObject("Auto Send Prescriptions");
         send.setResource(R.drawable.send_image_icon);
 
         MenuObject like = new MenuObject("Capture from camera");
@@ -346,7 +402,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 //    }
 
     //Upload image to server
-    private void uploadImage(String u_id){
+    private void uploadImage(String u_id,String order_id){
         class UploadImage extends AsyncTask<Bitmap,Void,String> {
 
             ProgressDialog loading;
@@ -362,7 +418,8 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 loading.dismiss();
-                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+
             }
 
             @Override
@@ -372,9 +429,10 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 
                 HashMap<String,String> data = new HashMap<>();
                 data.put("USER_ID",u_id);
-                data.put("ORDER_ID",generateOrderId());
+                data.put("ORDER_ID",order_id);
                 data.put(UPLOAD_KEY, uploadImage);
                 String result = rh.sendPostRequest(UPLOAD_URL,data);
+
 
                 return result;
             }
@@ -403,7 +461,8 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
                     //Show image to image Viewer and case 1 for Gallery
 //                    Uri editedImageUri = data.getData();
 //                    imV.setImageURI(editedImageUri);
-                    setBitmap();
+                    //setBitmap();
+                    findGeoLocation();
                     break;
                 case 2:
                     //Show image to image Viewer and case 2 for Camera
@@ -414,6 +473,8 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
                     Uri imageUri1 = Uri.parse(pathOfImage);
                     imV.setImageURI(imageUri1);
                     setBitmap();
+                    ChangeRotation(pathOfImage);
+                    imV.setImageBitmap(bitmap);
 //                    Intent imageEditorIntent1 = new AdobeImageIntent.Builder(this)
 //                            .setData(imageUri1)
 //                            .withAccentColor(R.color.colorPrimaryDark)
@@ -425,6 +486,8 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
                     Uri imageUri = Uri.parse(selectedImageUri.toString());
                     imV.setImageURI(imageUri);
                     setBitmap();
+                    ChangeRotation(selectedImageUri.toString());
+                    imV.setImageBitmap(bitmap);
 
 //                    Intent imageEditorIntent = new AdobeImageIntent.Builder(this)
 //                            .setData(imageUri)
@@ -547,7 +610,6 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 
         Intent i=new Intent(this,MapsActivity.class);
         Bundle b=new Bundle();
-//        b.putString("UPLOAD_KEY",uploadImage);
         b.putString("USER_ID",user_id);
         b.putString("ORDER_ID",generateOrderId());
         i.putExtra("image",byteArray);
@@ -588,6 +650,216 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
         bitmap=retVal;
     }
 
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    public void autoSendPrescription()
+    {
+
+        if(haveNetworkConnection()) {
+            if(checkGPS()) {
+                findGeoLocation();
+                RequestParams params = null;
+                params=new RequestParams();
+                String str_lat=String.format("%.6f",latitude);
+                String str_lng=String.format("%.6f",longitude);
+                params.put("lat",str_lat);
+                params.put("lng", str_lng);
+                params.put("ORDER_ID",OrderID);
+                //Toast.makeText(this,str_lat+" "+str_lng+" "+generateOrderId(),Toast.LENGTH_LONG).show();
+                invokeWS(params);
+            }
+            else{
+                GPSValidater();
+            }
+        }
+        else
+        {
+            internetFailureDialog();
+        }
+    }
+
+    public void internetFailureDialog()
+    {
+        // Display message in dialog box if you have not internet connection
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("No Internet Connection");
+        alertDialogBuilder.setMessage("You are offline please check your internet connection");
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                //Toast.makeText(MainActivity.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+
+
+    public void findGeoLocation()
+    {
+
+        lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Criteria c = new Criteria();
+
+        provider = lm.getBestProvider(c, false);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            return;
+        }
+        l = lm.getLastKnownLocation(provider);
+        if (l != null) {
+            //get latitude and longitude of the location
+            longitude = l.getLongitude();
+            latitude = l.getLatitude();
+            //display on text view
+            //Toast.makeText(this, latitude + " " + longitude, Toast.LENGTH_LONG).show();
+
+        }
+
+
+    }
+    public boolean checkGPS()
+    {
+        boolean isCheck=true;
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean enabled = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        // Check if enabled and if not send user to the GPS settings
+        if (!enabled) {
+            isCheck=false;
+        }
+        else{
+            isCheck=true;
+        }
+        return isCheck;
+    }
+
+    public void GPSValidater()
+    {
+
+        LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //Ask the user to enable GPS
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Location Manager");
+            builder.setMessage("Would you like to enable GPS?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //Launch settings, allowing user to make a change
+//                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                    startActivity(i);
+                    startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 1);
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //No location service, no Activity
+                    finish();
+                }
+            });
+            builder.create().show();
+        }
+
+
+    }
+
+    public void invokeWS(RequestParams params) {
+        // Show Progress Dialog
+        prgDialog.show();
+        // Make RESTful webservice call using AsyncHttpClient object
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://thepharmacist.freeoda.com/requesthandle/RequestRoute.php", params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
+                // Hide Progress Dialog
+                prgDialog.hide();
+                String tag = null;
+                String status = null;
+                if (responseBody != null && responseBody.length > 0) {
+                    try {
+                        String s = new String(responseBody);
+                        jsonObject = new JSONObject(s);
+                        jsonArray = jsonObject.getJSONArray("server_response");
+                        int i = 0;
+                       // StringBuffer buffer = new StringBuffer();
+                        while (i < jsonArray.length()) {
+                            JSONObject JO = jsonArray.getJSONObject(i);
+                            String st = JO.getString("status");
+                            if (statusCode == 200 && st.equals("ok")) {
+
+                                Toast.makeText(getApplicationContext(), "Successfully Send to nearby pharmacies", Toast.LENGTH_LONG).show();
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Send Fail", Toast.LENGTH_LONG).show();
+                            }
+                            i++;
+                        }
+                        //showMessage("Taxi Details", buffer.toString());
+                        //viewFromAdapter();
+                        ;
+
+
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                // Hide Progress Dialog
+                prgDialog.hide();
+                // When Http response code is '404'
+                if (statusCode == 404) {
+                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if (statusCode == 500) {
+                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else {
+                    Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+    }
 
 
 }

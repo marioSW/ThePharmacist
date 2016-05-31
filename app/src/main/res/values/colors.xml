@@ -10,5 +10,16 @@
     <color name="image_border_start">#408f06f1</color>
     <color name="image_border_end">#320941</color>
     <color name="image_border_center">#cf0df5</color>
+    <color name="feed_bg">#d3d6db</color>
+    <color name="feed_item_bg">#ffffff</color>
+    <color name="feed_item_border">#c2c3c8</color>
+    <color name="pumpkin">#d35400</color>
+    <color name="emerald">#2ecc71</color>
+    <color name="flatred">#e74c3c</color>
+
+    <color name="text_color">#222222</color>
+
+    <color name="light_black">#504f4f</color>
+    <color name="black">#000000</color>
 
 </resources>

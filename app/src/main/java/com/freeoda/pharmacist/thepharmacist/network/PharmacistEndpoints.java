@@ -15,4 +15,7 @@ public abstract class PharmacistEndpoints implements NetworkApi {
 
     protected final String RESET_PWD = this.PHARMACIST_URL+"resetPwd.php";
 
+    protected final String GET_CONFIRMED_ORDERS = this.PHARMACIST_URL+"getConfirmedOrders.php";
+
+
 }

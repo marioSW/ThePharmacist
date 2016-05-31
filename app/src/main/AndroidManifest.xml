@@ -4,22 +4,42 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--For Capture image from Camera and Gallery-->
+    <!-- For Capture image from Camera and Gallery -->
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--end-->
+    <!-- end -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.freeoda.pharmacist.thepharmacist.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.freeoda.pharmacist.thepharmacist.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality. 
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="com.freeoda.pharmacist.thepharmacist.permission.MAPS_RECEIVE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".MainApplication"
-        >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".SplashscreenActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,19 +48,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EnterEmailActivity"
+            android:name=".registeruser.EnterEmailActivity"
             android:label="Email Address"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".EnterNameActivity"
+            android:name=".registeruser.EnterNameActivity"
             android:label="Enter Name" />
         <activity
-            android:name=".EnterBirthDayActivity"
+            android:name=".registeruser.EnterBirthDayActivity"
             android:label="Enter BirthDay" />
-        <activity android:name=".EnterPwdActivity" />
+        <activity android:name=".registeruser.EnterPwdActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ResetPasswordActivity"/>
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"
+            />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity
+            android:name=".ViewConfirmedOrdersActivity"
+            android:label="Confirmed Orders" />
+        <activity
+            android:name=".ViewOrderDescriptionActivity"
+            android:label="Order in detail" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -52,13 +81,14 @@
             android:value="@string/facebook_app_id" />
 
         <activity
-            android:name=".EnterNumberActivity"
+            android:name=".registeruser.EnterNumberActivity"
             android:label="Enter Number" />
-
         <activity
             android:name=".Home"
             android:label="@string/title_activity_home"
             android:parentActivityName=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -73,11 +103,74 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.freeoda.pharmacist.thepharmacist.Home" />
         </activity>
-        <provider
-            android:name="com.adobe.creativesdk.aviary.internal.cds.CdsProvider"
-            android:authorities="${applicationId}.CdsProvider"
-            android:exported="false" />
+        <activity
+            android:name=".ImageDisplay"
+            android:label="@string/app_edit_image"
+            android:parentActivityName=".Home"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.freeoda.pharmacist.thepharmacist.Home" />
+        </activity>
 
+        <!--<provider-->
+            <!--android:name="com.adobe.creativesdk.aviary.internal.cds.CdsProvider"-->
+            <!--android:authorities="${applicationId}.CdsProvider"-->
+            <!--android:exported="false" />-->
+
+        <service
+            android:name=".PushNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.freeoda.pharmacist.thepharmacist" />
+            </intent-filter>
+        </receiver>
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.freeoda.pharmacist.thepharmacist.ImageDisplay" />
+        </activity>
+        <activity
+            android:name=".SelectPharmacies"
+            android:label="@string/title_activity_select_pharmacies"
+            android:parentActivityName=".MapsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.freeoda.pharmacist.thepharmacist.MapsActivity" />
+        </activity>
+
+        <activity
+            android:name=".ViewOrdersOnMap"
+            android:label="@string/title_activity_view_orders_on_map" />
+        <activity
+            android:name=".DecriptionMapActivity"
+            android:label="@string/title_activity_decription_map"></activity>
     </application>
 
 </manifest>

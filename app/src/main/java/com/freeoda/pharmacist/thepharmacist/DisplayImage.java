@@ -1,7 +1,6 @@
 package com.freeoda.pharmacist.thepharmacist;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,25 +9,21 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.adobe.creativesdk.aviary.AdobeImageIntent;
+//import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 public class DisplayImage extends AppCompatActivity {
@@ -36,8 +31,10 @@ public class DisplayImage extends AppCompatActivity {
     ImageView imV;
     String path=null;
     String galleryPath=null;
+    EditText orderID=null;
+    EditText userID=null;
 
-    public static final String UPLOAD_URL = "http://thepharmacist.freeoda.com/upload.php";
+    public static final String UPLOAD_URL = "http://thepharmacist.freeoda.com/uploadScript.php";
     public static final String UPLOAD_KEY = "image";
     public Bitmap bitmap;
 
@@ -51,32 +48,33 @@ public class DisplayImage extends AppCompatActivity {
         //Extract the data…
         path =bundle.getString("filePath");
         galleryPath=bundle.getString("imageUri");
+      //  userID=(EditText)findViewById(R.id.userId);
+       // orderID=(EditText)findViewById(R.id.orderId);
         imV=(ImageView)findViewById(R.id.image_view1);
         if(path!=null) {
-         //   bitmap=setPic(path);
-
+            //   bitmap=setPic(path);
             // Uri imageUri = Uri.parse("http://my-site.com/my-image.jpg");
-            Uri imageUri1 = Uri.parse(path);
-            Intent imageEditorIntent1 = new AdobeImageIntent.Builder(this)
-                    .setData(imageUri1)
-                    .build();
-
-            startActivityForResult(imageEditorIntent1,2);
+//            Uri imageUri1 = Uri.parse(path);
+//            Intent imageEditorIntent1 = new AdobeImageIntent.Builder(this)
+//                    .setData(imageUri1)
+//                    .build();
+//
+//            startActivityForResult(imageEditorIntent1,2);
         }
         else
         {
 
-          //  bitmap=setGallery(galleryPath);
-         //   Toast.makeText(getApplicationContext(),galleryPath,Toast.LENGTH_LONG).show();
-           // Bundle bundle = getIntent().getExtras();
+            //  bitmap=setGallery(galleryPath);
+            //   Toast.makeText(getApplicationContext(),galleryPath,Toast.LENGTH_LONG).show();
+            // Bundle bundle = getIntent().getExtras();
             // Uri imageUri = Uri.parse("http://my-site.com/my-image.jpg");
             Uri imageUri = Uri.parse(galleryPath);
 
-            Intent imageEditorIntent = new AdobeImageIntent.Builder(this)
-                    .setData(imageUri)
-                    .build();
-
-            startActivityForResult(imageEditorIntent, 1);
+//            Intent imageEditorIntent = new AdobeImageIntent.Builder(this)
+//                    .setData(imageUri)
+//                    .build();
+//
+//            startActivityForResult(imageEditorIntent, 1);
 
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -132,9 +130,6 @@ public class DisplayImage extends AppCompatActivity {
         }
 
         return bit;
-
-
-
 
     }
 
@@ -210,7 +205,9 @@ public class DisplayImage extends AppCompatActivity {
         {
             case R.id.input_id:
                 getStringImage(bitmap);
-                uploadImage();
+                String user_id=userID.getText().toString();
+                String order_id=orderID.getText().toString();
+                uploadImage(user_id,order_id);
                 return true;
 
             default:
@@ -219,7 +216,7 @@ public class DisplayImage extends AppCompatActivity {
     }
 
     //Upload image to server
-    private void uploadImage(){
+    private void uploadImage(String u_id,String or_id){
         class UploadImage extends AsyncTask<Bitmap,Void,String> {
 
             ProgressDialog loading;
@@ -244,7 +241,8 @@ public class DisplayImage extends AppCompatActivity {
                 String uploadImage = getStringImage(bitmap);
 
                 HashMap<String,String> data = new HashMap<>();
-
+                data.put("USER_ID",u_id);
+                data.put("ORDER_ID",or_id);
                 data.put(UPLOAD_KEY, uploadImage);
                 String result = rh.sendPostRequest(UPLOAD_URL,data);
 

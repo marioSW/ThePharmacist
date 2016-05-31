@@ -1,37 +1,53 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
+import com.freeoda.pharmacist.thepharmacist.exceptions.HttpExceptionHandler;
+import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
+import com.freeoda.pharmacist.thepharmacist.models.Order;
+import com.freeoda.pharmacist.thepharmacist.network.NetworkCallbackWithArray;
+import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
+import com.freeoda.pharmacist.thepharmacist.registeruser.EnterNumberActivity;
+import com.skyfishjy.library.RippleBackground;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import tyrantgit.explosionfield.ExplosionField;
 
 public class Home extends AppCompatActivity {
 
     ImageButton button;
     ImageButton gallery;
+    ImageButton notification;
+    ImageButton viewMap;
    // ImageView imageView;
     static final int CAM_REQUEST=1;
     static final int SELECT_PICTURE = 2;
@@ -39,6 +55,10 @@ public class Home extends AppCompatActivity {
     private static final String JPEG_FILE_SUFFIX = ".jpg";
     String path=null;
     private String selectedImagePath=null;
+
+    private RippleBackground rippleBackground;
+    private ExplosionField mExplosionField;
+
 
 
 
@@ -49,7 +69,11 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         button=(ImageButton)findViewById(R.id.button2);
+        notification = (ImageButton)findViewById(R.id.notificationBtn);
+        viewMap = (ImageButton)findViewById(R.id.testBtn1);
         //imageView=(ImageView)findViewById(R.id.image_view);
+        rippleBackground=(RippleBackground)findViewById(R.id.content);
+        rippleBackground.startRippleAnimation();
         gallery=(ImageButton)findViewById(R.id.button3);
 
         gallery.setOnClickListener(
@@ -79,13 +103,27 @@ public class Home extends AppCompatActivity {
                     }
                 }
         );
+
+
+        notification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this, ViewConfirmedOrdersActivity.class));
+            }
+        });
+
+        viewMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this, ViewOrdersOnMap.class));
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setLogo(R.drawable.white_logo);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
-
 
     private File createImageFile()
     {
@@ -105,30 +143,24 @@ public class Home extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-       // String path="/sdcard/the_pharmacist/came_image.jpg";
+        // String path="/sdcard/the_pharmacist/came_image.jpg";
         if((resultCode == RESULT_OK)) {
             if(requestCode==CAM_REQUEST){
-            //setPic(path);
-            Intent i = new Intent(this, DisplayImage.class);
-            //Create the bundle
-            Bundle bundle = new Bundle();
-            bundle.putString("filePath", path);
-            i.putExtras(bundle);
-            startActivity(i);
+                //setPic(path);
+                Intent i = new Intent(this,ImageDisplay.class);
+                //Create the bundle
+                Bundle bundle = new Bundle();
+                bundle.putString("filePath", path);
+                i.putExtras(bundle);
+                startActivity(i);
             }
-           else if(requestCode==SELECT_PICTURE)
+            else if(requestCode==SELECT_PICTURE)
             {
                 Uri selectedImageUri = data.getData();
                 selectedImagePath = getPath(selectedImageUri);
-                //setPic(selectedImagePath);
-               // Intent i = new Intent(this, DisplayImage.class);
-                //Create the bundle
-               // Bundle bundle = new Bundle();
-               // bundle.putString("galleryPath",selectedImagePath);
-               // i.putExtras(bundle);
-               // startActivity(i);
 
-                Intent i=new Intent(this,DisplayImage.class);
+
+                Intent i=new Intent(this,ImageDisplay.class);
                 //Create the bundle
                 Bundle bundle = new Bundle();
                 bundle.putString("imageUri",selectedImageUri.toString());
@@ -220,6 +252,39 @@ public class Home extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void logOut(View view)
+    {
+        SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+
+        String loginMethod = sharedpreferences.getString("LoginMethod","");
+        Log.i("TAG", loginMethod);
+        if(loginMethod.equals("facebook")){
+            LoginManager.getInstance().logOut();
+            finish();
+            startActivity(new Intent(Home.this,LoginActivity.class));
+
+            editor.putString("LoginMethod", "");
+            editor.commit();
+
+            // Clear Preferences and other data and go back to login activty
+        }
+        else if (loginMethod.equals("google")){
+            //LoginActivity.googlePlusLogout();
+            LoginActivity.mGooglePlusLogoutClicked = true;
+            finish();
+            startActivity(new Intent(Home.this, LoginActivity.class));
+            editor.putString("LoginMethod", "");
+            editor.commit();
+        }
+        else if (loginMethod.equals("normal")){
+            finish();
+            startActivity(new Intent(Home.this,LoginActivity.class));
+            editor.putString("LoginMethod", "");
+            editor.commit();
+        }
     }
 
 

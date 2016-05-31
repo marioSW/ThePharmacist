@@ -13,6 +13,8 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -66,7 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker marker=null;
 
     //New GPS Tracker
-    GPSTrackerNew gpsTracker = null;
+    //*GPSTrackerNew gpsTracker = null;
 
 
     GoogleApiClient mGoogleApiClient;
@@ -122,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         initializeVariables();
 
         // create class object
-        gpsTracker=new GPSTrackerNew(this);
+        //*gpsTracker=new GPSTrackerNew(this);
         seekValue="4";
         initiateMap();
         // Initialize the textview with '0'.
@@ -223,19 +225,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void initiateMap()
     {
-        if(checkGPS()) {
-            findGeoLocation();
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
-            }
+        if(haveNetworkConnection()) {
+            if (checkGPS()) {
+                findGeoLocation();
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
+                }
 
-            getVechile();
+                getVechile();
+            } else {
+                GPSValidater();
+            }
         }
         else
         {
-            GPSValidater();
+            internetFailureDialog();
         }
 
 
@@ -425,7 +431,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         b.putString("my_lat",Double.toString(latitude));
         b.putString("my_lng",Double.toString(longitude));
         b.putString("radi",seekValue);
-//        b.putString("UPLOAD_KEY1",upload_image);
         b.putString("USER_ID1",user_id);
         b.putString("ORDER_ID1",order_id);
         i.putExtra("image",byteArray);
@@ -491,5 +496,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             }
         }
+    }
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    public void internetFailureDialog()
+    {
+        // Display message in dialog box if you have not internet connection
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("No Internet Connection");
+        alertDialogBuilder.setMessage("You are offline please check your internet connection");
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                //Toast.makeText(MainActivity.this,"No Internet Connection",Toast.LENGTH_LONG).show();
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }
