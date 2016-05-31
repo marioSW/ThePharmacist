@@ -1,4 +1,4 @@
-package com.freeoda.pharmacist.thepharmacist;
+package com.freeoda.pharmacist.thepharmacist.registeruser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.freeoda.pharmacist.thepharmacist.LoginActivity;
+import com.freeoda.pharmacist.thepharmacist.R;
 import com.freeoda.pharmacist.thepharmacist.exceptions.CustomException;
 import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
 import com.freeoda.pharmacist.thepharmacist.models.User;
@@ -42,7 +44,7 @@ public class EnterPwdActivity extends AppCompatActivity {
                     if (!password.getText().toString().equals(ConfirmPassword.getText().toString())) {
                         Toast.makeText(getBaseContext(), "password does not match", Toast.LENGTH_LONG).show();
                     } else {
-                        //global.personDetails.setPassword(password.getText().toString());
+                        //LoginSession.personDetails.setPassword(password.getText().toString());
                         SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
                         User user = new User();
                         user.setBirthDate(sharedpreferences.getString("birthday",""));

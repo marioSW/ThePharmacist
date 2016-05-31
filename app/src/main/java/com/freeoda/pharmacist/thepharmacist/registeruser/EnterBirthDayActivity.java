@@ -1,4 +1,4 @@
-package com.freeoda.pharmacist.thepharmacist;
+package com.freeoda.pharmacist.thepharmacist.registeruser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+
+import com.freeoda.pharmacist.thepharmacist.R;
 
 public class EnterBirthDayActivity extends AppCompatActivity {
 
@@ -28,7 +30,7 @@ public class EnterBirthDayActivity extends AppCompatActivity {
         btnPwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //global.personDetails.setBirthDate(bday);
+                //LoginSession.personDetails.setBirthDate(bday);
                 SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedpreferences.edit();
                 editor.putString("birthday",bday );

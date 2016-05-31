@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#c7bfd2"
+    tools:context="com.freeoda.pharmacist.thepharmacist.ImageDisplay"
+    tools:showIn="@layout/activity_image_display"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    >
+
+    <LinearLayout
+        android:id="@+id/horizontal_dropdown_icon_menu_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#333"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:visibility="invisible"
+        >
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/onclick_press_color"
+            android:onClick="galleryClickAction"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:src="@drawable/gallary_icon"
+            android:text="Android Custom Horizontal Dropdown Menu Icons"
+            android:layout_alignParentLeft="true"
+            android:layout_weight=".25"
+            />
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/onclick_press_color"
+            android:onClick="cameraClickAction"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:src="@drawable/bottom_camera_icon"
+            android:text="Android Custom Horizontal Dropdown Menu Icons"
+            android:layout_weight=".25"
+            />
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/onclick_press_color"
+            android:onClick="transferEvent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:src="@drawable/tick_icon"
+            android:text="Android Custom Horizontal Dropdown Menu Icons"
+            android:layout_alignParentRight="true"
+            android:layout_weight=".25"
+            />
+
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/image_for_upload"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/flower_butter"
+        android:scaleType="fitCenter"
+        android:onClick="horizontalDropDownIconMenu"
+        android:layout_alignParentTop="true"
+        />
+
+</RelativeLayout>
