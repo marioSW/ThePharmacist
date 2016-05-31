@@ -1,4 +1,4 @@
-package com.freeoda.pharmacist.thepharmacist;
+package com.freeoda.pharmacist.thepharmacist.registeruser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.freeoda.pharmacist.thepharmacist.R;
+
 public class EnterEmailActivity extends AppCompatActivity {
 
     @Override
@@ -17,19 +19,19 @@ public class EnterEmailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_enter_email);
 
         final EditText txtEmail = (EditText) findViewById(R.id.txtEmail1);
-        Button btnMobile = (Button) findViewById(R.id.btnSignUpWithMobile);
-        btnMobile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        //Button btnMobile = (Button) findViewById(R.id.btnSignUpWithMobile);
+//        btnMobile.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onBackPressed();
+//            }
+//        });
 
         Button btnMobileNo = (Button) findViewById(R.id.btnEmailToMobileNo);
         btnMobileNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //global.personDetails.setEmail(txtEmail.getText().toString());
+                //LoginSession.personDetails.setEmail(txtEmail.getText().toString());
                 if (txtEmail.getText().toString().equals("")) {
                     txtEmail.setError("Please enter Mobile Number");
                 } else {

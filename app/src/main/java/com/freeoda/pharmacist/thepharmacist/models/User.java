@@ -29,6 +29,12 @@ public class User extends BaseModel implements Serializable {
     @SerializedName("password")
     private String password;
 
+    @SerializedName("statuscode")
+    private String statusCode;
+
+    @SerializedName("message")
+    private String message;
+
 
 //    public String getCountry() {
 //        return country;
@@ -88,5 +94,21 @@ public class User extends BaseModel implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

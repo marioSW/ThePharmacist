@@ -4,36 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="easytoget.com.design.DisplayImage"
     tools:showIn="@layout/activity_display_image">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:id="@+id/rel_imageView"
-        >
 
-        <ImageView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+
+   <!-- <ImageView
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:visibility="visible"
             android:id="@+id/image_view1"
-            />
-    </RelativeLayout>
+            style="@style/myImageView"
 
-    <Button
+        />-->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:text="Next"
-        android:textColor="#fff"
-        android:gravity="center"
-        android:id="@+id/imageNext"
-        android:background="@drawable/mybutton"
-        android:layout_below="@+id/rel_imageView"
-        android:layout_centerHorizontal="true" />
+        android:layout_height="match_parent"
+        android:id="@+id/image_view1"
+        android:adjustViewBounds="true"
+        android:visibility="visible"
+        android:scaleType="fitCenter"
+        />
+
+
+
 
 
 </RelativeLayout>

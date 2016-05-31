@@ -1,4 +1,4 @@
-package com.freeoda.pharmacist.thepharmacist;
+package com.freeoda.pharmacist.thepharmacist.registeruser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.freeoda.pharmacist.thepharmacist.R;
 
 import java.util.ArrayList;
 
@@ -40,8 +42,8 @@ public class EnterNameActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!firstName.getText().toString().equals("") && !lastName.getText().toString().equals("")) {
                     Log.i("TAG", firstName.getText().toString());
-                    //global.personDetails.setFirstName("kkk");
-                    //global.personDetails.setLastName(lastName.getText().toString());
+                    //LoginSession.personDetails.setFirstName("kkk");
+                    //LoginSession.personDetails.setLastName(lastName.getText().toString());
                     SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedpreferences.edit();
                     editor.putString("firstName",firstName.getText().toString() );

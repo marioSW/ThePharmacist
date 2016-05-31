@@ -1,5 +1,6 @@
 package com.freeoda.pharmacist.thepharmacist;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,6 +31,7 @@ import com.freeoda.pharmacist.thepharmacist.models.ModelApi;
 import com.freeoda.pharmacist.thepharmacist.models.User;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkCallback;
 import com.freeoda.pharmacist.thepharmacist.network.NetworkFacade;
+import com.freeoda.pharmacist.thepharmacist.registeruser.EnterNumberActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -37,15 +40,17 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -62,12 +67,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText password;
     CallbackManager callbackManager;
     private ProgressDialog pDialog;
+
     String user;
     String pass;
     final Context context = this;
+    GoogleCloudMessaging gcmObj;
+    Context applicationContext;
+    Activity activity;
+    String registerId;
 
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int RC_SIGN_IN = 9001;// Logcat tag
     private static final String TAG = "LoginActivity";
+    public static final String PROPERTY_REG_ID = "registration_id";
 
     // Google client to interact with Google API
     private static GoogleApiClient mGoogleApiClient;
@@ -120,66 +132,68 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(LoginResult loginResult) {
                 if (isOnline()) {
-                    // App code
-                    Log.i("TAG", "Before graph request");
-                    GraphRequest request = GraphRequest.newMeRequest(
-                            loginResult.getAccessToken(),
-                            new GraphRequest.GraphJSONObjectCallback() {
-                                @Override
-                                public void onCompleted(
-                                        JSONObject object,
-                                        GraphResponse response) {
-                                    // Application code
-                                    try {
-                                        JSONObject jobject = new JSONObject(response.getRawResponse());
-                                        User user = new User();
-                                        user.setFirstName(jobject.getString("first_name"));
-                                        user.setLastName((jobject.getString("last_name")));
-                                        user.setBirthDate(jobject.getString("birthday"));
-                                        if (jobject.has("mobile")) {
-                                            user.setMobileNo(jobject.getString("mobile"));
-                                        } else {
-                                            user.setMobileNo("Not_given");
+                    if (checkPlayServices()) {
+                        // App code
+                        Log.i("TAG", "Before graph request");
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                loginResult.getAccessToken(),
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(
+                                            JSONObject object,
+                                            GraphResponse response) {
+                                        // Application code
+                                        try {
+                                            JSONObject jobject = new JSONObject(response.getRawResponse());
+
+                                            User user = new User();
+                                            user.setFirstName(jobject.getString("first_name"));
+                                            user.setLastName((jobject.getString("last_name")));
+                                            user.setBirthDate(jobject.getString("birthday"));
+                                            if (jobject.has("mobile")) {
+                                                user.setMobileNo(jobject.getString("mobile"));
+                                            } else {
+                                                user.setMobileNo("Not_given");
+                                            }
+                                            user.setEmail(jobject.getString("email"));
+                                            user.setPassword("fb_password");
+                                            NetworkFacade.registerUser(user, getApplicationContext(), new NetworkCallback() {
+                                                @Override
+                                                public void onSuccess(ModelApi result) {
+                                                    Log.d("TAG", result.toString());
+                                                }
+
+                                                @Override
+                                                public void onError(CustomException exception) {
+
+                                                }
+                                            });
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
-                                        user.setEmail(jobject.getString("email"));
-                                        user.setPassword("fb_password");
-                                        NetworkFacade.registerUser(user, getApplicationContext(), new NetworkCallback() {
-                                            @Override
-                                            public void onSuccess(ModelApi result) {
-                                                Log.d("TAG", result.toString());
-                                            }
+                                        Intent loginIntent = new Intent(LoginActivity.this, Home.class);
 
-                                            @Override
-                                            public void onError(CustomException exception) {
+                                        SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                                        editor.putString("LoginMethod", "facebook");
 
-                                            }
-                                        });
+                                        editor.commit();
+                                        //Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
 
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
+                                        startActivity(loginIntent);
+
+
                                     }
 
-                                    SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                                    editor.putString("LoginMethod", "facebook");
-
-                                    editor.commit();
-                                    //Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
-
-                                    Intent loginIntent = new Intent(LoginActivity.this, Home.class);
-
-                                    startActivity(loginIntent);
-
-
-                                }
-
-                            });
-                    Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id,first_name,last_name,location,email,gender, birthday,verified");
-                    request.setParameters(parameters);
-                    request.executeAsync();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Connection unavailble", Toast.LENGTH_SHORT).show();
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id,first_name,last_name,location,email,gender, birthday,verified");
+                        request.setParameters(parameters);
+                        request.executeAsync();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Connection unavailble", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
 
@@ -233,26 +247,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 } else {
 
                     if (isOnline()) {
-                        NetworkFacade.loginUser(user, pass, getApplicationContext(), new NetworkCallback() {
-                            @Override
-                            public void onSuccess(ModelApi result) {
-                                SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedpreferences.edit();
-                                editor.putString("LoginMethod", "normal");
-                                editor.commit();
-                                //startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                startActivity(new Intent(LoginActivity.this, Home.class));
+                        if (checkPlayServices()) {
+                            registerInBackground();
+                            final SharedPreferences prefs = getGCMPreferences(context);
+                            String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+                            NetworkFacade.loginUser(user, pass, registrationId, getApplicationContext(), new NetworkCallback() {
+                                @Override
+                                public void onSuccess(ModelApi result) {
+                                    SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                                    editor.putString("LoginMethod", "normal");
+                                    editor.commit();
 
-                            }
+//
+                                    //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    startActivity(new Intent(LoginActivity.this, Home.class));
 
-                            @Override
-                            public void onError(CustomException exception) {
-                                Toast.makeText(getApplicationContext(), "login failed", Toast.LENGTH_LONG).show();
+                                }
 
-                            }
-                        });
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Connection unavailable!", Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onError(CustomException exception) {
+                                    Toast.makeText(getApplicationContext(), "login failed", Toast.LENGTH_LONG).show();
+
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Connection unavailable!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
 
@@ -284,7 +305,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             dialog.dismiss();
                             // set the custom dialog components
 
-                            Log.i(TAG,x);
+                            Log.i(TAG, x);
                             NetworkFacade.sendEmailPwdReset(x, getApplicationContext()
                                     , new NetworkCallback() {
                                 @Override
@@ -301,8 +322,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             NetworkFacade.sendCodePwdReset(forgotPwdCodeTxt.getText().toString(), getApplicationContext(), new NetworkCallback() {
                                                 @Override
                                                 public void onSuccess(ModelApi result) {
-                                                    Log.i(TAG,result.toString());
-                                                    startActivity(new Intent(LoginActivity.this,ResetPasswordActivity.class));
+                                                    Log.i(TAG, result.toString());
+                                                    startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
                                                 }
 
                                                 @Override
@@ -416,6 +437,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -483,6 +505,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
             //getProfileInformation();
+
             SharedPreferences sharedpreferences = getSharedPreferences(EnterNumberActivity.MyPREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.putString("LoginMethod", "google");
@@ -520,7 +543,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public static void googlePlusLogout() {
-        Log.i("TAG", "Google log outttttttttttttttt");
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
             mGoogleApiClient.disconnect();
@@ -528,6 +550,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Log.i("TAG", "Google sign out");
         }
     }
+
 
     public static void logoutFromGooglePlus() {
         mGooglePlusLogoutClicked = true;  // Keep track when you click logout
@@ -554,4 +577,80 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 });
     }
 
+
+    private String registerInBackground() {
+        new AsyncTask<Void, Void, String>() {
+            String regId = "";
+
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    if (gcmObj == null) {
+                        gcmObj = GoogleCloudMessaging.getInstance(context);
+                    }
+                    InstanceID instanceID = InstanceID.getInstance(context);
+                    regId = instanceID.getToken(ApplicationConstants.GOOGLE_PROJ_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                    Log.i(TAG, regId);
+                    // Persist the regID - no need to register again.
+                    storeRegistrationId(context, regId);
+                } catch (IOException ex) {
+                    // If there is an error, don't just keep trying to register.
+                    // Require the user to click a button again, or perform
+                    // exponential back-off.
+                    //handler.onFailure("Error :" + ex.getMessage());
+                }
+                return regId;
+            }
+
+            @Override
+            protected void onPostExecute(String regId) {
+                if (regId != null) {
+                    registerId = regId;
+                    Log.i("tag INSIDE background", registerId);
+                } else {
+                    Log.i("TAG", "reg id is null");
+                }
+            }
+        }.execute(null, null, null);
+
+        return registerId;
+    }
+
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private void storeRegistrationId(Context context, String regId) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PROPERTY_REG_ID, regId);
+        editor.commit();
+    }
+
+    private SharedPreferences getGCMPreferences(Context context) {
+        // This sample app persists the registration ID in shared preferences, but
+        // how you store the regID in your app is up to you.
+        return getContext().getSharedPreferences(context.getPackageName(),
+                Context.MODE_PRIVATE);
+    }
+
+    private Context getContext() {
+        return context;
+    }
 }

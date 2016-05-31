@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/android_card_view_example"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:elevation="4dp"
+            android:padding="16dp">
+
+            <CheckBox
+                android:id="@+id/checkBox1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+            />
+
+            <ImageView
+                android:id="@+id/cardview_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="18dp"
+                android:layout_toRightOf="@+id/checkBox1"
+                android:src="@drawable/pharmacylist_icon" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/cardview_image"
+                >
+
+            <TextView
+                android:id="@+id/phar_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+
+                android:paddingBottom="5dp"
+                android:text="Pharmacy Name"
+                android:textSize="15sp"
+                android:layout_marginTop="10dp"
+                />
+
+            <TextView
+                android:id="@+id/distance_phar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/phar_name"
+
+                android:text="Pharmacy Distance :0.77Km"
+                android:textColor="#8b8b8b" />
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>
