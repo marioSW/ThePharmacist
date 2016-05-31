@@ -103,6 +103,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.freeoda.pharmacist.thepharmacist.Home" />
         </activity>
+
         <activity
             android:name=".ImageDisplay"
             android:label="@string/app_edit_image"

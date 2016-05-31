@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.AlertDialogWrapper;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.freeoda.pharmacist.thepharmacist.captureimage.RequestHandler;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -56,6 +59,10 @@ public class SelectPharmacies extends AppCompatActivity {
     public static final String UPLOAD_KEY = "image";
     List<String> list=null;
 
+    MaterialDialog.Builder builder;
+
+    MaterialDialog progress_dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,7 @@ public class SelectPharmacies extends AppCompatActivity {
         adapter2=new MarkerAdapter(getApplicationContext(),0);
         getNearByPharmacies();
         listView.setAdapter(adapter2);
+
     }
 
     public void getNearByPharmacies()
@@ -112,6 +120,13 @@ public class SelectPharmacies extends AppCompatActivity {
     public void invokeWS(RequestParams params) {
         // Show Progress Dialog
         //prgDialog.show();
+       // progress_dialog.show();
+        builder=new MaterialDialog.Builder(this)
+                .title(R.string.progress_dialog_nearby)
+                .content(R.string.please_wait)
+                .progress(true, 0);
+        progress_dialog=builder.build();
+        progress_dialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
         client.get("http://thepharmacist.freeoda.com/findPharmacy.php", params, new AsyncHttpResponseHandler() {
@@ -121,6 +136,8 @@ public class SelectPharmacies extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 // Hide Progress Dialog
                 // prgDialog.hide();
+
+                progress_dialog.dismiss();
                 String tag = null;
                 String status = null;
                 if (responseBody != null && responseBody.length > 0) {
@@ -165,7 +182,7 @@ public class SelectPharmacies extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 // Hide Progress Dialog
-                // prgDialog.hide();
+                progress_dialog.dismiss();
                 // When Http response code is '404'
                 if (statusCode == 404) {
                     Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
@@ -299,7 +316,7 @@ public class SelectPharmacies extends AppCompatActivity {
     }
     public void invokeWS1(RequestParams params) {
         // Show Progress Dialog
-        prgDialog.show();
+      //  prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
         client.get("http://thepharmacist.freeoda.com/tester.php", params, new AsyncHttpResponseHandler() {
@@ -307,7 +324,8 @@ public class SelectPharmacies extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 // Hide Progress Dialog
-                prgDialog.hide();
+               // prgDialog.hide();
+
                 String tag = null;
                 String status = null;
                 if (responseBody != null && responseBody.length > 0) {
@@ -322,10 +340,10 @@ public class SelectPharmacies extends AppCompatActivity {
                             String st = JO.getString("status");
                             if (statusCode == 200 && st.equals("ok")) {
 
-                                Toast.makeText(getApplicationContext(), "Insert Success", Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getApplicationContext(), "Insert Success", Toast.LENGTH_LONG).show();
 
                             } else {
-                                Toast.makeText(getApplicationContext(), "Insert Fail", Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getApplicationContext(), "Insert Fail", Toast.LENGTH_LONG).show();
                             }
                             i++;
                         }
@@ -347,7 +365,7 @@ public class SelectPharmacies extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 // Hide Progress Dialog
-                 prgDialog.hide();
+                // prgDialog.hide();
                 // When Http response code is '404'
                 if (statusCode == 404) {
                     Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
@@ -374,6 +392,7 @@ public class SelectPharmacies extends AppCompatActivity {
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return encodedImage;
+
     }
 
 
@@ -382,18 +401,24 @@ public class SelectPharmacies extends AppCompatActivity {
         class UploadImage extends AsyncTask<Bitmap,Void,String> {
 
             ProgressDialog loading;
+
             RequestHandler rh = new RequestHandler();
+
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                loading = ProgressDialog.show(SelectPharmacies.this, "Uploading...", null,true,true);
+               // loading = ProgressDialog.show(SelectPharmacies.this, "Uploading...", null,true,true);
+                prgDialog.show();
             }
 
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                loading.dismiss();
+               // loading.dismiss();
+
+                prgDialog.dismiss();
+                finishDialogBox();
                // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
 
             }
@@ -406,8 +431,9 @@ public class SelectPharmacies extends AppCompatActivity {
                 HashMap<String,String> data = new HashMap<>();
                 data.put("USER_ID",user_id1);
                 data.put("ORDER_ID",order_id1);
-                data.put(UPLOAD_KEY,upload_image1);
+                data.put(UPLOAD_KEY, upload_image1);
                 String result = rh.sendPostRequest(UPLOAD_URL,data);
+
 
 
                 return result;
@@ -482,10 +508,36 @@ public class SelectPharmacies extends AppCompatActivity {
             else{
                 sendToPharmacy();
                 imageUpload();
+
+
             }
         }
         else
             internetFailureDialog();
+    }
+
+    public void finishDialogBox()
+    {
+        new AlertDialogWrapper.Builder(this)
+                .setTitle(R.string.title)
+                .setMessage(R.string.message)
+                .setCancelable(false)
+                .setNegativeButton("Go To Home", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i=new Intent(getApplicationContext(),Home.class);
+                        startActivity(i);
+
+                    }
+                })
+                .setPositiveButton("Back To Map", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .show();
     }
 
 }

@@ -135,6 +135,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 
        // userID=(EditText)findViewById(R.id.userId1);
         imV=(ImageView)findViewById(R.id.image_for_upload);
+        user_id ="USER1";
         if(path!=null||galleryPath!=null) {
 
             moveToPhotoEditor();
@@ -191,7 +192,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
 
         }
         getStringImage(bitmap);
-        user_id="CHECK_USER_001";
+        user_id="USER1";
         uploadImage = getStringImage(bitmap);
     }
 
@@ -255,7 +256,7 @@ public class ImageDisplay extends AppCompatActivity implements OnMenuItemClickLi
                 if(checkGPS()) {
                     OrderID=generateOrderId();
                     autoSendPrescription();
-                    user_id = "CHECK_USER_001";
+                    user_id ="USER1";
                     uploadImage = getStringImage(bitmap);
                     uploadImage(user_id,OrderID);
                 }

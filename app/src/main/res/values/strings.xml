@@ -10,5 +10,11 @@
     <string name="context_menu">Context menu</string>
     <string name="app_edit_image">Capture Image</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_select_pharmacies">SelectPharmacies</string>
+    <string name="title_activity_select_pharmacies">Select Pharmacies</string>
+
+    <string name="progress_dialog_nearby">Please wait for NearBy Pharmacies.</string>
+    <string name="please_wait">Please Wait....</string>
+
+    <string name="title">Sending Information</string>
+    <string name="message">Successfully sent your prescription.. </string>
 </resources>
