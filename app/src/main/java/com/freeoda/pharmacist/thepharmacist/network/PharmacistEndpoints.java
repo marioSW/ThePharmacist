@@ -17,5 +17,9 @@ public abstract class PharmacistEndpoints implements NetworkApi {
 
     protected final String GET_CONFIRMED_ORDERS = this.PHARMACIST_URL+"getConfirmedOrders.php";
 
+    protected final String USER_CONFIRM = this.PHARMACIST_URL+"userConfirmed.php";
+
+    protected final String USER_DECLINE = this.PHARMACIST_URL+"userDeclined.php";
+
 
 }

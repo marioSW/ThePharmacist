@@ -56,4 +56,18 @@ public abstract class NetworkFacade {
         final OrderResponse orderResponse = new OrderResponse(context);
         orderResponse.getConfirmedOrders(username,callback);
     }
+
+    public static void confirmUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
+
+        final OrderResponse orderResponse = new OrderResponse(context);
+        orderResponse.userConfirmOrder(pharId, orderId, callback);
+
+    }
+
+    public static void declineUserOrder(final String pharId,final String orderId,Context context,final NetworkCallback callback){
+
+        final OrderResponse orderResponse = new OrderResponse(context);
+        orderResponse.userConfirmOrder(pharId,orderId,callback);
+
+    }
 }
