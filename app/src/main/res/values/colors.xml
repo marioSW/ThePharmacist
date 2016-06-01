@@ -11,8 +11,4 @@
     <color name="image_border_end">#320941</color>
     <color name="image_border_center">#cf0df5</color>
 
-    <color name="image_border_start">#408f06f1</color>
-    <color name="image_border_end">#320941</color>
-    <color name="image_border_center">#cf0df5</color>
-
 </resources>
